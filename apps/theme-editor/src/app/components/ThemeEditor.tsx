@@ -1,13 +1,8 @@
 import { Box, createTheme, ThemeProvider } from '@mui/material';
-import { useForm, FormProvider } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { FormProvider } from 'react-hook-form';
 import Sidebar from './Sidebar';
 import Preview from './Preview';
-import {
-  ThemeFormData,
-  ThemeFormSchema,
-  defaultThemeValues,
-} from '../types/theme';
+import { usePersistedForm } from '../hooks/usePersistedForm';
 
 // Stable theme for the editor interface - this won't change
 const editorTheme = createTheme({
@@ -18,11 +13,7 @@ const editorTheme = createTheme({
 });
 
 function ThemeEditor() {
-  const methods = useForm<ThemeFormData>({
-    resolver: zodResolver(ThemeFormSchema),
-    defaultValues: defaultThemeValues,
-    mode: 'onChange',
-  });
+  const methods = usePersistedForm();
 
   return (
     <ThemeProvider theme={editorTheme}>
