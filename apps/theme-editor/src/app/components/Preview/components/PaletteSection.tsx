@@ -30,10 +30,15 @@ const PaletteSection = () => {
                   { key: 'dark', label: 'Dark' },
                   // { key: 'contrastText', label: 'Contrast', textColor: 'black' },
                 ].map((colorItem) => {
+                  const roundToTwoDecimals = (value: number) => {
+                    return Math.round(value * 100) / 100;
+                  };
                   const contrastRatio = getContrastRatio(
                     theme.palette[color][colorItem.key],
                     theme.palette[color].contrastText
                   );
+                  const roundedContrastRatio =
+                    roundToTwoDecimals(contrastRatio);
                   const AAContrastRatio = 4.5;
                   const isAccessible = contrastRatio >= AAContrastRatio;
                   return (
@@ -41,9 +46,14 @@ const PaletteSection = () => {
                       key={colorItem.key}
                       sx={{
                         backgroundColor: `${color}.${colorItem.key}`,
+                        color: theme.palette[color].contrastText,
                       }}
                     >
                       {colorItem.label}
+                      <br />
+                      {theme.palette[color][colorItem.key]}
+                      <br />
+                      {roundedContrastRatio}
                       {isAccessible ? <CheckIcon /> : <CloseIcon />}
                     </Box>
                   );
