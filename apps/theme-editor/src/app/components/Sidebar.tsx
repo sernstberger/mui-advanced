@@ -24,7 +24,7 @@ import {
 } from '../store/themeSlice';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import type { ThemeState } from '../store/themeSlice';
 
 const fontFamilies = ['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans'];
@@ -76,6 +76,45 @@ function Sidebar() {
 
   // Calculate scale from fontSize
   const scale = typography.fontSize / BASE_FONT_SIZE;
+
+  // Color validation state
+  const [colorErrors, setColorErrors] = useState({
+    primary: false,
+    secondary: false,
+    error: false,
+    warning: false,
+    info: false,
+    success: false,
+  });
+  // Store previous valid colors
+  const prevColors = useRef({
+    primary: palette.primary.main,
+    secondary: palette.secondary.main,
+    error: palette.error.main,
+    warning: palette.warning.main,
+    info: palette.info.main,
+    success: palette.success.main,
+  });
+
+  // Validate hex color (accepts #RGB, #RRGGBB, #RGBA, #RRGGBBAA)
+  const isValidHex = (value: string) =>
+    /^#([0-9A-Fa-f]{3,4}|[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$/.test(value);
+
+  // Generalized color change handler
+  const handleColorChange =
+    (key: keyof typeof colorErrors, action: (v: string) => void) =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const value = e.target.value;
+      if (isValidHex(value)) {
+        setColorErrors((err) => ({ ...err, [key]: false }));
+        prevColors.current[key] = value;
+        action(value);
+      } else {
+        setColorErrors((err) => ({ ...err, [key]: true }));
+        // Revert to previous valid color
+        action(prevColors.current[key]);
+      }
+    };
 
   // Handle font size slider change
   const handleFontSizeChange = (_: any, value: number | number[]) => {
@@ -138,8 +177,10 @@ function Sidebar() {
         margin="dense"
         sx={{ mb: 1 }}
         value={palette.primary.main}
-        onChange={(e) => dispatch(updatePrimaryColor(e.target.value))}
+        onChange={handleColorChange('primary', updatePrimaryColor)}
         InputLabelProps={{ shrink: true }}
+        error={colorErrors.primary}
+        helperText={colorErrors.primary ? 'Invalid hex color' : ''}
       />
       <TextField
         label="Secondary Color"
@@ -148,8 +189,10 @@ function Sidebar() {
         margin="dense"
         sx={{ mb: 1 }}
         value={palette.secondary.main}
-        onChange={(e) => dispatch(updateSecondaryColor(e.target.value))}
+        onChange={handleColorChange('secondary', updateSecondaryColor)}
         InputLabelProps={{ shrink: true }}
+        error={colorErrors.secondary}
+        helperText={colorErrors.secondary ? 'Invalid hex color' : ''}
       />
       <TextField
         label="Error Color"
@@ -158,8 +201,10 @@ function Sidebar() {
         margin="dense"
         sx={{ mb: 1 }}
         value={palette.error.main}
-        onChange={(e) => dispatch(updateErrorColor(e.target.value))}
+        onChange={handleColorChange('error', updateErrorColor)}
         InputLabelProps={{ shrink: true }}
+        error={colorErrors.error}
+        helperText={colorErrors.error ? 'Invalid hex color' : ''}
       />
       <TextField
         label="Warning Color"
@@ -168,8 +213,10 @@ function Sidebar() {
         margin="dense"
         sx={{ mb: 1 }}
         value={palette.warning.main}
-        onChange={(e) => dispatch(updateWarningColor(e.target.value))}
+        onChange={handleColorChange('warning', updateWarningColor)}
         InputLabelProps={{ shrink: true }}
+        error={colorErrors.warning}
+        helperText={colorErrors.warning ? 'Invalid hex color' : ''}
       />
       <TextField
         label="Info Color"
@@ -178,8 +225,10 @@ function Sidebar() {
         margin="dense"
         sx={{ mb: 1 }}
         value={palette.info.main}
-        onChange={(e) => dispatch(updateInfoColor(e.target.value))}
+        onChange={handleColorChange('info', updateInfoColor)}
         InputLabelProps={{ shrink: true }}
+        error={colorErrors.info}
+        helperText={colorErrors.info ? 'Invalid hex color' : ''}
       />
       <TextField
         label="Success Color"
@@ -188,8 +237,10 @@ function Sidebar() {
         margin="dense"
         sx={{ mb: 1 }}
         value={palette.success.main}
-        onChange={(e) => dispatch(updateSuccessColor(e.target.value))}
+        onChange={handleColorChange('success', updateSuccessColor)}
         InputLabelProps={{ shrink: true }}
+        error={colorErrors.success}
+        helperText={colorErrors.success ? 'Invalid hex color' : ''}
       />
       <Divider sx={{ my: 2 }} />
       <Typography variant="subtitle2" gutterBottom>
