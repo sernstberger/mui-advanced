@@ -10,6 +10,26 @@ const editorTheme = createTheme({
     mode: 'light',
     primary: { main: '#1976d2' },
   },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontWeight: 700,
+          textTransform: 'none',
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+        fullWidth: true,
+        margin: 'dense',
+        InputLabelProps: {
+          shrink: true,
+        },
+      },
+    },
+  },
 });
 
 function ThemeEditor() {

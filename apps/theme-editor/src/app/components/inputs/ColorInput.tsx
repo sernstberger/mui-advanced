@@ -9,17 +9,7 @@ interface ColorInputProps {
 
 const ColorInput = ({ name, label }: ColorInputProps) => {
   const { field } = useController({ name });
-  return (
-    <TextField
-      label={label}
-      type="color"
-      fullWidth
-      margin="dense"
-      sx={{ mb: 1 }}
-      {...field}
-      InputLabelProps={{ shrink: true }}
-    />
-  );
+  return <TextField label={label} type="color" {...field} />;
 };
 
 export default ColorInput;
