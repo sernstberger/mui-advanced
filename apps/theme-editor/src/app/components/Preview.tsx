@@ -36,7 +36,7 @@ function Preview() {
   }, [watchedValues]);
 
   return (
-    <Box sx={{ flex: 1, overflow: 'hidden' }}>
+    <Box sx={{ flex: 1, overflow: 'auto' }}>
       <ThemeProvider theme={previewTheme}>
         <CssBaseline />
         <PreviewGrid />

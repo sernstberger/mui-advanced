@@ -23,6 +23,7 @@ import {
   MAX_SCALE,
   defaultThemeValues,
 } from '../../types/theme';
+import ColorInput from '../inputs/ColorInput';
 
 function generateThemeCode(data: ThemeFormData) {
   return `import { createTheme } from '@mui/material/styles';
@@ -148,107 +149,17 @@ function Sidebar() {
         )}
       />
 
-      <Controller
-        name="palette.primary.main"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Primary Color"
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={field.value}
-            onChange={field.onChange}
-            InputLabelProps={{ shrink: true }}
-          />
-        )}
-      />
+      <ColorInput name="palette.primary.main" label="Primary Color" />
 
-      <Controller
-        name="palette.secondary.main"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Secondary Color"
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={field.value}
-            onChange={field.onChange}
-            InputLabelProps={{ shrink: true }}
-          />
-        )}
-      />
+      <ColorInput name="palette.secondary.main" label="Secondary Color" />
 
-      <Controller
-        name="palette.error.main"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Error Color"
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={field.value}
-            onChange={field.onChange}
-            InputLabelProps={{ shrink: true }}
-          />
-        )}
-      />
+      <ColorInput name="palette.error.main" label="Error Color" />
 
-      <Controller
-        name="palette.warning.main"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Warning Color"
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={field.value}
-            onChange={field.onChange}
-            InputLabelProps={{ shrink: true }}
-          />
-        )}
-      />
+      <ColorInput name="palette.warning.main" label="Warning Color" />
 
-      <Controller
-        name="palette.info.main"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Info Color"
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={field.value}
-            onChange={field.onChange}
-            InputLabelProps={{ shrink: true }}
-          />
-        )}
-      />
+      <ColorInput name="palette.info.main" label="Info Color" />
 
-      <Controller
-        name="palette.success.main"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            label="Success Color"
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={field.value}
-            onChange={field.onChange}
-            InputLabelProps={{ shrink: true }}
-          />
-        )}
-      />
+      <ColorInput name="palette.success.main" label="Success Color" />
 
       <Divider sx={{ my: 2 }} />
 
