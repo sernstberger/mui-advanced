@@ -24,6 +24,7 @@ import {
   defaultThemeValues,
 } from '../../types/theme';
 import ColorInput from '../inputs/ColorInput';
+import ColorItem from './ColorItem';
 
 function generateThemeCode(data: ThemeFormData) {
   return `import { createTheme } from '@mui/material/styles';
@@ -150,17 +151,17 @@ function Sidebar() {
       />
 
       {/* <ColorInput name="palette.primary.main" label="Primary Color" /> */}
-      <ColorInput name="primary" label="Primary Color" />
+      <ColorItem name="primary" label="Primary Color" />
 
-      <ColorInput name="secondary" label="Secondary Color" />
+      <ColorItem name="secondary" label="Secondary Color" />
 
-      <ColorInput name="error" label="Error Color" />
+      <ColorItem name="error" label="Error Color" />
 
-      <ColorInput name="warning" label="Warning Color" />
+      <ColorItem name="warning" label="Warning Color" />
 
-      <ColorInput name="info" label="Info Color" />
+      <ColorItem name="info" label="Info Color" />
 
-      <ColorInput name="success" label="Success Color" />
+      <ColorItem name="success" label="Success Color" />
 
       <Divider sx={{ my: 2 }} />
 
