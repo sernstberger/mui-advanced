@@ -1,5 +1,7 @@
 import { Paper, Typography, Stack } from '@mui/material';
 import { ColorInput } from '../inputs';
+import ModeToggle from './ModeToggle';
+import ResetButton from './ResetButton';
 
 const ColorSection = () => {
   return (
@@ -14,7 +16,8 @@ const ColorSection = () => {
         <ColorInput name="palette.warning.main" label="Warning Color" />
         <ColorInput name="palette.info.main" label="Info Color" />
         <ColorInput name="palette.success.main" label="Success Color" />
-        {/* ModeToggle and ResetButton will be implemented separately */}
+        <ModeToggle />
+        <ResetButton />
       </Stack>
     </Paper>
   );

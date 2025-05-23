@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import Sidebar from './Sidebar';
+import Sidebar from './Sidebar/Sidebar';
 import Preview from './Preview';
 
 function ThemeEditor() {

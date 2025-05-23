@@ -3,6 +3,7 @@ import { FormProvider } from 'react-hook-form';
 import useThemeForm from '../../hooks/useThemeForm';
 import ColorSection from './ColorSection';
 import TypographySection from './TypographySection';
+import ExportSection from './ExportSection';
 
 const Sidebar = () => {
   const form = useThemeForm();
@@ -16,7 +17,7 @@ const Sidebar = () => {
         <Divider sx={{ mb: 2 }} />
         <ColorSection />
         <TypographySection />
-        {/* ExportSection will be added here */}
+        <ExportSection />
       </Box>
     </FormProvider>
   );
