@@ -3,7 +3,7 @@ import { createTheme } from '@mui/material/styles';
 
 const defaultMuiTheme = createTheme();
 
-interface ThemeState {
+export interface ThemeState {
   palette: {
     primary: { main: string };
     secondary: { main: string };
