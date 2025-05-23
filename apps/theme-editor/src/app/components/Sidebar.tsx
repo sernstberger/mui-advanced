@@ -24,7 +24,7 @@ import {
 } from '../store/themeSlice';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import type { ThemeState } from '../store/themeSlice';
 import MuiAlert from '@mui/material/Alert';
 import { loadThemeState } from '../store/localStorage';
