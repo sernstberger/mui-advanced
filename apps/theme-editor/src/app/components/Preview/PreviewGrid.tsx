@@ -5,6 +5,7 @@ import CardSection from './components/CardSection';
 import TypographySection from './components/TypographySection';
 import ChipSection from './components/ChipSection';
 import AlertSection from './components/AlertSection';
+import PaletteSection from './components/PaletteSection';
 
 const PreviewGrid = () => {
   return (
@@ -13,6 +14,9 @@ const PreviewGrid = () => {
         Theme Preview
       </Typography>
       <Grid container spacing={3}>
+        <Grid size={{ xs: 12 }}>
+          <PaletteSection />
+        </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
           <ButtonSection />
         </Grid>
