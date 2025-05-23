@@ -1,3 +1,4 @@
+import { darken, lighten, rgbToHex } from '@mui/material/styles';
 import { z } from 'zod';
 
 export const ThemeFormSchema = z.object({
@@ -63,25 +64,40 @@ export const defaultThemeValues: ThemeFormData = {
   palette: {
     mode: 'light',
     primary: {
-      light: '#1976d2',
+      light: rgbToHex(lighten('#1976d2', 0.2)),
       main: '#1976d2',
-      dark: '#1976d2',
-      contrastText: '#1976d2',
+      dark: rgbToHex(darken('#1976d2', 0.2)),
+      contrastText: '#ffffff',
     },
     secondary: {
+      light: rgbToHex(lighten('#dc004e', 0.2)),
       main: '#dc004e',
+      dark: rgbToHex(darken('#dc004e', 0.2)),
+      contrastText: '#ffffff',
     },
     error: {
+      light: rgbToHex(lighten('#f44336', 0.2)),
       main: '#f44336',
+      dark: rgbToHex(darken('#f44336', 0.2)),
+      contrastText: '#ffffff',
     },
     warning: {
+      light: rgbToHex(lighten('#ff9800', 0.2)),
       main: '#ff9800',
+      dark: rgbToHex(darken('#ff9800', 0.2)),
+      contrastText: '#ffffff',
     },
     info: {
+      light: rgbToHex(lighten('#2196f3', 0.2)),
       main: '#2196f3',
+      dark: rgbToHex(darken('#2196f3', 0.2)),
+      contrastText: '#ffffff',
     },
     success: {
+      light: rgbToHex(lighten('#4caf50', 0.2)),
       main: '#4caf50',
+      dark: rgbToHex(darken('#4caf50', 0.2)),
+      contrastText: '#ffffff',
     },
   },
   typography: {

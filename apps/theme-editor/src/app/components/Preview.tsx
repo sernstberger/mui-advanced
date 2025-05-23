@@ -18,7 +18,11 @@ function Preview() {
         palette: {
           mode: watchedValues.palette.mode,
           primary: {
+            light: watchedValues.palette.primary?.light || '#63a4ff',
             main: watchedValues.palette.primary?.main || '#1976d2',
+            dark: watchedValues.palette.primary?.dark || '#004ba0',
+            contrastText:
+              watchedValues.palette.primary?.contrastText || '#ffffff',
           },
           secondary: {
             main: watchedValues.palette.secondary?.main || '#dc004e',

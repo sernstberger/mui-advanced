@@ -4,12 +4,13 @@ import { TextField } from '@mui/material';
 interface ColorInputProps {
   name: string;
   label: string;
+  value?: string;
 }
 
-const ColorInput = ({ name, label }: ColorInputProps) => {
+const ColorInput = ({ name, label, value }: ColorInputProps) => {
   const { field } = useController({ name });
 
-  return <TextField label={label} type="color" {...field} />;
+  return <TextField label={label} type="color" {...field} value={value} />;
 };
 
 export default ColorInput;
