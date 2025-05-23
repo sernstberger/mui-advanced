@@ -8,8 +8,9 @@
       },
       "configurations": {
         "github-pages": {
-          "baseHref": "/mui-advanced/",
-          "deployUrl": "/mui-advanced/"
+          "env": {
+            "VITE_BASE": "/mui-advanced/"
+          }
         }
       },
       "parallelism": true
