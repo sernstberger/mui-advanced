@@ -1,0 +1,23 @@
+import { Paper, Typography, Stack } from '@mui/material';
+import { ColorInput } from '../inputs';
+
+const ColorSection = () => {
+  return (
+    <Paper sx={{ p: 2, mb: 2 }}>
+      <Typography variant="subtitle1" gutterBottom>
+        Palette
+      </Typography>
+      <Stack spacing={2}>
+        <ColorInput name="palette.primary.main" label="Primary Color" />
+        <ColorInput name="palette.secondary.main" label="Secondary Color" />
+        <ColorInput name="palette.error.main" label="Error Color" />
+        <ColorInput name="palette.warning.main" label="Warning Color" />
+        <ColorInput name="palette.info.main" label="Info Color" />
+        <ColorInput name="palette.success.main" label="Success Color" />
+        {/* ModeToggle and ResetButton will be implemented separately */}
+      </Stack>
+    </Paper>
+  );
+};
+
+export default ColorSection;
