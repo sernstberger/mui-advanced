@@ -1,12 +1,18 @@
 {
   "targets": {
     "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/theme-editor",
+        "command": "vite build"
+      },
       "configurations": {
         "github-pages": {
           "baseHref": "/mui-advanced/",
           "deployUrl": "/mui-advanced/"
         }
-      }
+      },
+      "parallelism": true
     }
   }
 }
