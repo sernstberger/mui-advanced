@@ -149,17 +149,18 @@ function Sidebar() {
         )}
       />
 
-      <ColorInput name="palette.primary.main" label="Primary Color" />
+      {/* <ColorInput name="palette.primary.main" label="Primary Color" /> */}
+      <ColorInput name="primary" label="Primary Color" />
 
-      <ColorInput name="palette.secondary.main" label="Secondary Color" />
+      <ColorInput name="secondary" label="Secondary Color" />
 
-      <ColorInput name="palette.error.main" label="Error Color" />
+      <ColorInput name="error" label="Error Color" />
 
-      <ColorInput name="palette.warning.main" label="Warning Color" />
+      <ColorInput name="warning" label="Warning Color" />
 
-      <ColorInput name="palette.info.main" label="Info Color" />
+      <ColorInput name="info" label="Info Color" />
 
-      <ColorInput name="palette.success.main" label="Success Color" />
+      <ColorInput name="success" label="Success Color" />
 
       <Divider sx={{ my: 2 }} />
 

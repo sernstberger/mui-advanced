@@ -2,12 +2,42 @@ import { z } from 'zod';
 
 export const ThemeFormSchema = z.object({
   palette: z.object({
-    primary: z.object({ main: z.string().regex(/^#[0-9A-Fa-f]{6}$/) }),
-    secondary: z.object({ main: z.string().regex(/^#[0-9A-Fa-f]{6}$/) }),
-    error: z.object({ main: z.string().regex(/^#[0-9A-Fa-f]{6}$/) }),
-    warning: z.object({ main: z.string().regex(/^#[0-9A-Fa-f]{6}$/) }),
-    info: z.object({ main: z.string().regex(/^#[0-9A-Fa-f]{6}$/) }),
-    success: z.object({ main: z.string().regex(/^#[0-9A-Fa-f]{6}$/) }),
+    primary: z.object({
+      light: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      main: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      dark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      contrastText: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }),
+    secondary: z.object({
+      light: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      main: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      dark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      contrastText: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }),
+    error: z.object({
+      light: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      main: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      dark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      contrastText: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }),
+    warning: z.object({
+      light: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      main: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      dark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      contrastText: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }),
+    info: z.object({
+      light: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      main: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      dark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      contrastText: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }),
+    success: z.object({
+      light: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      main: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      dark: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      contrastText: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    }),
     mode: z.enum(['light', 'dark']),
   }),
   typography: z.object({
@@ -33,7 +63,10 @@ export const defaultThemeValues: ThemeFormData = {
   palette: {
     mode: 'light',
     primary: {
+      light: '#1976d2',
       main: '#1976d2',
+      dark: '#1976d2',
+      contrastText: '#1976d2',
     },
     secondary: {
       main: '#dc004e',
