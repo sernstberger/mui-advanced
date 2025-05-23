@@ -20,7 +20,7 @@ export default defineConfig(() => ({
   //  plugins: [ nxViteTsPaths() ],
   // },
   build: {
-    outDir: './dist',
+    outDir: '../../dist/apps/theme-editor',
     emptyOutDir: true,
     reportCompressedSize: true,
     commonjsOptions: {
