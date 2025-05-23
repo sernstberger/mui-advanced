@@ -19,7 +19,7 @@ export interface ThemeState {
   };
 }
 
-const initialState: ThemeState = {
+export const initialState: ThemeState = {
   palette: {
     primary: { main: defaultMuiTheme.palette.primary.main },
     secondary: { main: defaultMuiTheme.palette.secondary.main },

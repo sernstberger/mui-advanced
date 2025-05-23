@@ -3,6 +3,7 @@ import { Button, Snackbar, Alert } from '@mui/material';
 import { useFormContext } from 'react-hook-form';
 import { useAppDispatch } from '../../hooks/redux';
 import { resetToDefaults } from '../../store/themeSlice';
+import { initialState } from '../../store/themeSlice';
 
 const ResetButton = () => {
   const { reset } = useFormContext();
@@ -11,8 +12,10 @@ const ResetButton = () => {
 
   const handleReset = () => {
     dispatch(resetToDefaults());
-    reset();
-    setOpen(true);
+    setTimeout(() => {
+      reset(initialState);
+      setOpen(true);
+    }, 0);
   };
 
   return (
