@@ -9,7 +9,7 @@ import {
   Button,
   Stack,
 } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../hooks/redux';
+import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import {
   updatePrimaryColor,
   updateSecondaryColor,
@@ -21,14 +21,14 @@ import {
   updateFontSize,
   updateMode,
   resetToDefaults,
-} from '../store/themeSlice';
+} from '../../store/themeSlice';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useState, useEffect } from 'react';
-import type { ThemeState } from '../store/themeSlice';
+import type { ThemeState } from '../../store/themeSlice';
 import MuiAlert from '@mui/material/Alert';
-import { loadThemeState } from '../store/localStorage';
-import { loadFont } from '../utils/loadFont';
+import { loadThemeState } from '../../store/localStorage';
+import { loadFont } from '../../utils/loadFont';
 
 const fontFamilies = ['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans'];
 
