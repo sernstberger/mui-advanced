@@ -6,6 +6,17 @@ import {
   MenuItem,
   Slider,
 } from '@mui/material';
+import { useAppSelector, useAppDispatch } from '../hooks/redux';
+import {
+  updatePrimaryColor,
+  updateSecondaryColor,
+  updateErrorColor,
+  updateWarningColor,
+  updateInfoColor,
+  updateSuccessColor,
+  updateFontFamily,
+  updateFontSize,
+} from '../store/themeSlice';
 
 const fontFamilies = [
   'Roboto',
@@ -16,11 +27,11 @@ const fontFamilies = [
   'Courier New',
 ];
 
-// Placeholder handler to avoid linter errors
-const noop = () => {};
-
 function Sidebar() {
-  // Placeholder handlers and state (to be connected to Redux in next step)
+  const dispatch = useAppDispatch();
+  const palette = useAppSelector((state) => state.theme.palette);
+  const typography = useAppSelector((state) => state.theme.typography);
+
   return (
     <Box
       sx={{
@@ -38,20 +49,60 @@ function Sidebar() {
       <Typography variant="subtitle2" gutterBottom>
         Palette
       </Typography>
-      {['primary', 'secondary', 'error', 'warning', 'info', 'success'].map(
-        (color) => (
-          <TextField
-            key={color}
-            label={`${color.charAt(0).toUpperCase() + color.slice(1)} Color`}
-            type="color"
-            fullWidth
-            margin="dense"
-            sx={{ mb: 1 }}
-            value={''}
-            onChange={noop}
-          />
-        )
-      )}
+      <TextField
+        label="Primary Color"
+        type="color"
+        fullWidth
+        margin="dense"
+        sx={{ mb: 1 }}
+        value={palette.primary.main}
+        onChange={(e) => dispatch(updatePrimaryColor(e.target.value))}
+      />
+      <TextField
+        label="Secondary Color"
+        type="color"
+        fullWidth
+        margin="dense"
+        sx={{ mb: 1 }}
+        value={palette.secondary.main}
+        onChange={(e) => dispatch(updateSecondaryColor(e.target.value))}
+      />
+      <TextField
+        label="Error Color"
+        type="color"
+        fullWidth
+        margin="dense"
+        sx={{ mb: 1 }}
+        value={palette.error.main}
+        onChange={(e) => dispatch(updateErrorColor(e.target.value))}
+      />
+      <TextField
+        label="Warning Color"
+        type="color"
+        fullWidth
+        margin="dense"
+        sx={{ mb: 1 }}
+        value={palette.warning.main}
+        onChange={(e) => dispatch(updateWarningColor(e.target.value))}
+      />
+      <TextField
+        label="Info Color"
+        type="color"
+        fullWidth
+        margin="dense"
+        sx={{ mb: 1 }}
+        value={palette.info.main}
+        onChange={(e) => dispatch(updateInfoColor(e.target.value))}
+      />
+      <TextField
+        label="Success Color"
+        type="color"
+        fullWidth
+        margin="dense"
+        sx={{ mb: 1 }}
+        value={palette.success.main}
+        onChange={(e) => dispatch(updateSuccessColor(e.target.value))}
+      />
       <Divider sx={{ my: 2 }} />
       <Typography variant="subtitle2" gutterBottom>
         Typography
@@ -61,8 +112,8 @@ function Sidebar() {
         label="Font Family"
         fullWidth
         margin="dense"
-        value={''}
-        onChange={noop}
+        value={typography.fontFamily}
+        onChange={(e) => dispatch(updateFontFamily(e.target.value))}
         sx={{ mb: 2 }}
       >
         {fontFamilies.map((family) => (
@@ -76,8 +127,8 @@ function Sidebar() {
         min={10}
         max={32}
         step={1}
-        value={14}
-        onChange={noop}
+        value={typography.fontSize}
+        onChange={(_, value) => dispatch(updateFontSize(Number(value)))}
         valueLabelDisplay="auto"
       />
     </Box>
