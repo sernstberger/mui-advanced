@@ -9,54 +9,37 @@ import {
   Button,
   Stack,
 } from '@mui/material';
-import { useAppSelector, useAppDispatch } from '../../hooks/redux';
-import {
-  updatePrimaryColor,
-  updateSecondaryColor,
-  updateErrorColor,
-  updateWarningColor,
-  updateInfoColor,
-  updateSuccessColor,
-  updateFontFamily,
-  updateFontSize,
-  updateMode,
-  resetToDefaults,
-} from '../../store/themeSlice';
+import { useFormContext, Controller } from 'react-hook-form';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useState, useEffect } from 'react';
-import type { ThemeState } from '../../store/themeSlice';
 import MuiAlert from '@mui/material/Alert';
-import { loadThemeState } from '../../store/localStorage';
 import { loadFont } from '../../utils/loadFont';
-import ColorInput from '../inputs/ColorInput';
-import { FormProvider, useForm } from 'react-hook-form';
+import {
+  ThemeFormData,
+  FONT_FAMILIES,
+  BASE_FONT_SIZE,
+  MIN_SCALE,
+  MAX_SCALE,
+  defaultThemeValues,
+} from '../../types/theme';
 
-const fontFamilies = ['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans'];
-
-const BASE_FONT_SIZE = 14;
-const MIN_SCALE = 0.8;
-const MAX_SCALE = 1.5;
-
-function generateThemeCode(
-  palette: ThemeState['palette'],
-  typography: ThemeState['typography']
-) {
+function generateThemeCode(data: ThemeFormData) {
   return `import { createTheme } from '@mui/material/styles';
 
 export const theme = createTheme({
   palette: {
-    mode: '${palette.mode}',
-    primary: { main: '${palette.primary.main}' },
-    secondary: { main: '${palette.secondary.main}' },
-    error: { main: '${palette.error.main}' },
-    warning: { main: '${palette.warning.main}' },
-    info: { main: '${palette.info.main}' },
-    success: { main: '${palette.success.main}' },
+    mode: '${data.palette.mode}',
+    primary: { main: '${data.palette.primary.main}' },
+    secondary: { main: '${data.palette.secondary.main}' },
+    error: { main: '${data.palette.error.main}' },
+    warning: { main: '${data.palette.warning.main}' },
+    info: { main: '${data.palette.info.main}' },
+    success: { main: '${data.palette.success.main}' },
   },
   typography: {
-    fontFamily: '${typography.fontFamily}',
-    fontSize: ${typography.fontSize},
+    fontFamily: '${data.typography.fontFamily}',
+    fontSize: ${data.typography.fontSize},
   },
 });
 
@@ -73,24 +56,21 @@ export const theme = createTheme({
 }
 
 function Sidebar() {
-  const dispatch = useAppDispatch();
-  const palette = useAppSelector((state) => state.theme.palette);
-  const typography = useAppSelector((state) => state.theme.typography);
+  const { control, watch, setValue, reset } = useFormContext<ThemeFormData>();
   const [copySuccess, setCopySuccess] = useState(false);
-  const themeCode = generateThemeCode(palette, typography);
-  const methods = useForm({
-    defaultValues: {
-      palette: palette,
-      typography: typography,
-    },
-  });
+  const [resetMessage, setResetMessage] = useState(false);
+
+  const watchedValues = watch();
+  const themeCode = generateThemeCode(watchedValues);
 
   // Calculate scale from fontSize
-  const scale = typography.fontSize / BASE_FONT_SIZE;
+  const scale = watchedValues.typography?.fontSize
+    ? watchedValues.typography.fontSize / BASE_FONT_SIZE
+    : 1;
 
   const handleFontSizeChange = (_: any, value: number | number[]) => {
     const scaleValue = Array.isArray(value) ? value[0] : value;
-    dispatch(updateFontSize(Math.round(BASE_FONT_SIZE * scaleValue)));
+    setValue('typography.fontSize', Math.round(BASE_FONT_SIZE * scaleValue));
   };
 
   const handleCopy = async () => {
@@ -113,28 +93,18 @@ function Sidebar() {
     URL.revokeObjectURL(url);
   };
 
-  const [storageError, setStorageError] = useState(false);
-  const [resetMessage, setResetMessage] = useState(false);
-
-  // Check for localStorage error on mount
-  useEffect(() => {
-    try {
-      loadThemeState();
-    } catch (e) {
-      setStorageError(true);
-    }
-  }, []);
-
-  // Handle reset with confirmation
   const handleReset = () => {
-    dispatch(resetToDefaults());
+    reset(defaultThemeValues);
     setResetMessage(true);
     setTimeout(() => setResetMessage(false), 2000);
   };
 
-  const onSubmit = (data: any) => {
-    console.log(data);
-  };
+  // Load font when font family changes
+  useEffect(() => {
+    if (watchedValues.typography?.fontFamily) {
+      loadFont(watchedValues.typography.fontFamily);
+    }
+  }, [watchedValues.typography?.fontFamily]);
 
   return (
     <Box
@@ -146,186 +116,232 @@ function Sidebar() {
         overflow: 'auto',
       }}
     >
-      <FormProvider {...methods}>
-        <form onSubmit={methods.handleSubmit(onSubmit)} noValidate>
-          {storageError && (
-            <MuiAlert severity="warning" sx={{ mb: 2 }}>
-              Theme could not be loaded from localStorage. Using default theme.
-            </MuiAlert>
-          )}
-          {resetMessage && (
-            <MuiAlert severity="success" sx={{ mb: 2 }}>
-              Theme reset to MUI defaults.
-            </MuiAlert>
-          )}
-          <Typography variant="h6" gutterBottom>
-            Theme Editor
-          </Typography>
-          <Divider sx={{ mb: 2 }} />
-          <Typography variant="subtitle2" gutterBottom>
-            Palette
-          </Typography>
+      {resetMessage && (
+        <MuiAlert severity="success" sx={{ mb: 2 }}>
+          Theme reset to MUI defaults.
+        </MuiAlert>
+      )}
+      <Typography variant="h6" gutterBottom>
+        Theme Editor
+      </Typography>
+      <Divider sx={{ mb: 2 }} />
+
+      <Typography variant="subtitle2" gutterBottom>
+        Palette
+      </Typography>
+
+      <Controller
+        name="palette.mode"
+        control={control}
+        render={({ field }) => (
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
             <Typography variant="body2">Light</Typography>
             <Switch
-              checked={palette.mode === 'dark'}
+              checked={field.value === 'dark'}
               onChange={(_, checked) =>
-                dispatch(updateMode(checked ? 'dark' : 'light'))
+                field.onChange(checked ? 'dark' : 'light')
               }
               inputProps={{ 'aria-label': 'toggle light/dark mode' }}
             />
             <Typography variant="body2">Dark</Typography>
           </Stack>
-          <ColorInput
-            name="palette.primary.main"
-            label="Primary Color rhf"
-            // value={palette.primary.main}
-            // onChange={(e) => dispatch(updatePrimaryColor(e.target.value))}
-          />
+        )}
+      />
+
+      <Controller
+        name="palette.primary.main"
+        control={control}
+        render={({ field }) => (
           <TextField
             label="Primary Color"
             type="color"
             fullWidth
             margin="dense"
             sx={{ mb: 1 }}
-            value={palette.primary.main}
-            onChange={(e) => dispatch(updatePrimaryColor(e.target.value))}
+            value={field.value}
+            onChange={field.onChange}
             InputLabelProps={{ shrink: true }}
           />
+        )}
+      />
+
+      <Controller
+        name="palette.secondary.main"
+        control={control}
+        render={({ field }) => (
           <TextField
             label="Secondary Color"
             type="color"
             fullWidth
             margin="dense"
             sx={{ mb: 1 }}
-            value={palette.secondary.main}
-            onChange={(e) => dispatch(updateSecondaryColor(e.target.value))}
+            value={field.value}
+            onChange={field.onChange}
             InputLabelProps={{ shrink: true }}
           />
+        )}
+      />
+
+      <Controller
+        name="palette.error.main"
+        control={control}
+        render={({ field }) => (
           <TextField
             label="Error Color"
             type="color"
             fullWidth
             margin="dense"
             sx={{ mb: 1 }}
-            value={palette.error.main}
-            onChange={(e) => dispatch(updateErrorColor(e.target.value))}
+            value={field.value}
+            onChange={field.onChange}
             InputLabelProps={{ shrink: true }}
           />
+        )}
+      />
+
+      <Controller
+        name="palette.warning.main"
+        control={control}
+        render={({ field }) => (
           <TextField
             label="Warning Color"
             type="color"
             fullWidth
             margin="dense"
             sx={{ mb: 1 }}
-            value={palette.warning.main}
-            onChange={(e) => dispatch(updateWarningColor(e.target.value))}
+            value={field.value}
+            onChange={field.onChange}
             InputLabelProps={{ shrink: true }}
           />
+        )}
+      />
+
+      <Controller
+        name="palette.info.main"
+        control={control}
+        render={({ field }) => (
           <TextField
             label="Info Color"
             type="color"
             fullWidth
             margin="dense"
             sx={{ mb: 1 }}
-            value={palette.info.main}
-            onChange={(e) => dispatch(updateInfoColor(e.target.value))}
+            value={field.value}
+            onChange={field.onChange}
             InputLabelProps={{ shrink: true }}
           />
+        )}
+      />
+
+      <Controller
+        name="palette.success.main"
+        control={control}
+        render={({ field }) => (
           <TextField
             label="Success Color"
             type="color"
             fullWidth
             margin="dense"
             sx={{ mb: 1 }}
-            value={palette.success.main}
-            onChange={(e) => dispatch(updateSuccessColor(e.target.value))}
+            value={field.value}
+            onChange={field.onChange}
             InputLabelProps={{ shrink: true }}
           />
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="subtitle2" gutterBottom>
-            Typography
-          </Typography>
+        )}
+      />
+
+      <Divider sx={{ my: 2 }} />
+
+      <Typography variant="subtitle2" gutterBottom>
+        Typography
+      </Typography>
+
+      <Controller
+        name="typography.fontFamily"
+        control={control}
+        render={({ field }) => (
           <TextField
             select
             label="Font Family"
             fullWidth
             margin="dense"
-            value={typography.fontFamily}
-            onChange={(e) => {
-              loadFont(e.target.value);
-              dispatch(updateFontFamily(e.target.value));
-            }}
+            value={field.value}
+            onChange={field.onChange}
             sx={{ mb: 2 }}
           >
-            {fontFamilies.map((family) => (
+            {FONT_FAMILIES.map((family) => (
               <MenuItem key={family} value={family}>
                 {family}
               </MenuItem>
             ))}
           </TextField>
-          <Typography gutterBottom>Font Size Scale</Typography>
-          <Slider
-            min={MIN_SCALE}
-            max={MAX_SCALE}
-            step={0.01}
-            value={scale}
-            onChange={handleFontSizeChange}
-            valueLabelDisplay="auto"
-            valueLabelFormat={(v) => `${(v * 100).toFixed(0)}%`}
-          />
-          <Divider sx={{ my: 2 }} />
-          <Typography variant="subtitle2" gutterBottom>
-            Export Theme
-          </Typography>
-          <Box
-            sx={{
-              bgcolor: 'background.paper',
-              border: 1,
-              borderColor: 'divider',
-              borderRadius: 1,
-              p: 1,
-              mb: 1,
-              fontFamily: 'monospace',
-              fontSize: 12,
-              maxHeight: 180,
-              overflow: 'auto',
-              whiteSpace: 'pre',
-            }}
-            component="pre"
-          >
-            {themeCode}
-          </Box>
-          <Stack spacing={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              fullWidth
-              startIcon={<ContentCopyIcon />}
-              onClick={handleCopy}
-            >
-              {copySuccess ? 'Copied!' : 'Copy Theme Code'}
-            </Button>
-            <Button
-              variant="outlined"
-              color="primary"
-              fullWidth
-              startIcon={<DownloadIcon />}
-              onClick={handleDownload}
-            >
-              Download theme.ts
-            </Button>
-            <Button
-              variant="text"
-              color="secondary"
-              fullWidth
-              onClick={handleReset}
-            >
-              Reset to Defaults
-            </Button>
-          </Stack>
-        </form>
-      </FormProvider>
+        )}
+      />
+
+      <Typography gutterBottom>Font Size Scale</Typography>
+      <Slider
+        min={MIN_SCALE}
+        max={MAX_SCALE}
+        step={0.01}
+        value={scale}
+        onChange={handleFontSizeChange}
+        valueLabelDisplay="auto"
+        valueLabelFormat={(v) => `${(v * 100).toFixed(0)}%`}
+      />
+
+      <Divider sx={{ my: 2 }} />
+
+      <Typography variant="subtitle2" gutterBottom>
+        Export Theme
+      </Typography>
+
+      <Box
+        sx={{
+          bgcolor: 'background.paper',
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          p: 1,
+          mb: 1,
+          fontFamily: 'monospace',
+          fontSize: 12,
+          maxHeight: 180,
+          overflow: 'auto',
+          whiteSpace: 'pre',
+        }}
+        component="pre"
+      >
+        {themeCode}
+      </Box>
+
+      <Stack spacing={1}>
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          startIcon={<ContentCopyIcon />}
+          onClick={handleCopy}
+        >
+          {copySuccess ? 'Copied!' : 'Copy Theme Code'}
+        </Button>
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          startIcon={<DownloadIcon />}
+          onClick={handleDownload}
+        >
+          Download theme.ts
+        </Button>
+        <Button
+          variant="text"
+          color="secondary"
+          fullWidth
+          onClick={handleReset}
+        >
+          Reset to Defaults
+        </Button>
+      </Stack>
     </Box>
   );
 }

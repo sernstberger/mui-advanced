@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createTheme } from '@mui/material/styles';
+import { setByPath } from '../utils/setByPath';
 
 const defaultMuiTheme = createTheme();
 
@@ -39,9 +40,6 @@ const themeSlice = createSlice({
   name: 'theme',
   initialState,
   reducers: {
-    updatePrimaryColor: (state, action: PayloadAction<string>) => {
-      state.palette.primary.main = action.payload;
-    },
     updateSecondaryColor: (state, action: PayloadAction<string>) => {
       state.palette.secondary.main = action.payload;
     },
@@ -66,12 +64,17 @@ const themeSlice = createSlice({
     updateFontSize: (state, action: PayloadAction<number>) => {
       state.typography.fontSize = action.payload;
     },
+    updateTheme: (
+      state,
+      action: PayloadAction<{ path: string; value: any }>
+    ) => {
+      setByPath(state, action.payload.path, action.payload.value);
+    },
     resetToDefaults: () => initialState,
   },
 });
 
 export const {
-  updatePrimaryColor,
   updateSecondaryColor,
   updateErrorColor,
   updateWarningColor,
@@ -80,6 +83,7 @@ export const {
   updateMode,
   updateFontFamily,
   updateFontSize,
+  updateTheme,
   resetToDefaults,
 } = themeSlice.actions;
 
