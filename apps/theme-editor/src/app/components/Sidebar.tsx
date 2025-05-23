@@ -22,6 +22,10 @@ import {
   updateMode,
   resetToDefaults,
 } from '../store/themeSlice';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import DownloadIcon from '@mui/icons-material/Download';
+import { useState } from 'react';
+import type { ThemeState } from '../store/themeSlice';
 
 const fontFamilies = ['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans'];
 
@@ -29,10 +33,46 @@ const BASE_FONT_SIZE = 14;
 const MIN_SCALE = 0.8;
 const MAX_SCALE = 1.5;
 
+function generateThemeCode(
+  palette: ThemeState['palette'],
+  typography: ThemeState['typography']
+) {
+  return `import { createTheme } from '@mui/material/styles';
+
+export const theme = createTheme({
+  palette: {
+    mode: '${palette.mode}',
+    primary: { main: '${palette.primary.main}' },
+    secondary: { main: '${palette.secondary.main}' },
+    error: { main: '${palette.error.main}' },
+    warning: { main: '${palette.warning.main}' },
+    info: { main: '${palette.info.main}' },
+    success: { main: '${palette.success.main}' },
+  },
+  typography: {
+    fontFamily: '${typography.fontFamily}',
+    fontSize: ${typography.fontSize},
+  },
+});
+
+// Usage instructions:
+// 1. Save this file as theme.ts in your project
+// 2. Import and use with ThemeProvider:
+// import { ThemeProvider } from '@mui/material/styles';
+// import { theme } from './theme';
+//
+// <ThemeProvider theme={theme}>
+//   <App />
+// </ThemeProvider>
+`;
+}
+
 function Sidebar() {
   const dispatch = useAppDispatch();
   const palette = useAppSelector((state) => state.theme.palette);
   const typography = useAppSelector((state) => state.theme.typography);
+  const [copySuccess, setCopySuccess] = useState(false);
+  const themeCode = generateThemeCode(palette, typography);
 
   // Calculate scale from fontSize
   const scale = typography.fontSize / BASE_FONT_SIZE;
@@ -41,6 +81,26 @@ function Sidebar() {
   const handleFontSizeChange = (_: any, value: number | number[]) => {
     const scaleValue = Array.isArray(value) ? value[0] : value;
     dispatch(updateFontSize(Math.round(BASE_FONT_SIZE * scaleValue)));
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(themeCode);
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 1500);
+    } catch (e) {
+      setCopySuccess(false);
+    }
+  };
+
+  const handleDownload = () => {
+    const blob = new Blob([themeCode], { type: 'text/typescript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'theme.ts';
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -161,11 +221,44 @@ function Sidebar() {
         valueLabelFormat={(v) => `${(v * 100).toFixed(0)}%`}
       />
       <Divider sx={{ my: 2 }} />
+      <Typography variant="subtitle2" gutterBottom>
+        Export Theme
+      </Typography>
+      <Box
+        sx={{
+          bgcolor: 'background.paper',
+          border: 1,
+          borderColor: 'divider',
+          borderRadius: 1,
+          p: 1,
+          mb: 1,
+          fontFamily: 'monospace',
+          fontSize: 12,
+          maxHeight: 180,
+          overflow: 'auto',
+          whiteSpace: 'pre',
+        }}
+        component="pre"
+      >
+        {themeCode}
+      </Box>
       <Stack spacing={1}>
-        <Button variant="contained" color="primary" fullWidth disabled>
-          Copy Theme Code
+        <Button
+          variant="contained"
+          color="primary"
+          fullWidth
+          startIcon={<ContentCopyIcon />}
+          onClick={handleCopy}
+        >
+          {copySuccess ? 'Copied!' : 'Copy Theme Code'}
         </Button>
-        <Button variant="outlined" color="primary" fullWidth disabled>
+        <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          startIcon={<DownloadIcon />}
+          onClick={handleDownload}
+        >
           Download theme.ts
         </Button>
         <Button
