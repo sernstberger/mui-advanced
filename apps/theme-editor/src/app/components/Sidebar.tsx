@@ -28,6 +28,7 @@ import { useState, useRef, useEffect } from 'react';
 import type { ThemeState } from '../store/themeSlice';
 import MuiAlert from '@mui/material/Alert';
 import { loadThemeState } from '../store/localStorage';
+import { loadFont } from '../utils/loadFont';
 
 const fontFamilies = ['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans'];
 
@@ -231,7 +232,10 @@ function Sidebar() {
         fullWidth
         margin="dense"
         value={typography.fontFamily}
-        onChange={(e) => dispatch(updateFontFamily(e.target.value))}
+        onChange={(e) => {
+          loadFont(e.target.value);
+          dispatch(updateFontFamily(e.target.value));
+        }}
         sx={{ mb: 2 }}
       >
         {fontFamilies.map((family) => (
