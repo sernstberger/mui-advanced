@@ -1,0 +1,12 @@
+{
+  "targets": {
+    "build": {
+      "configurations": {
+        "github-pages": {
+          "baseHref": "/mui-advanced/",
+          "deployUrl": "/mui-advanced/"
+        }
+      }
+    }
+  }
+}
