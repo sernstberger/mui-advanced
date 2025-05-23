@@ -1,9 +1,44 @@
-import nx from '@nx/eslint-plugin';
+import { FlatCompat } from '@eslint/eslintrc';
+import js from '@eslint/js';
+import nxEslintPlugin from '@nx/eslint-plugin';
+
+const compat = new FlatCompat({
+  baseDirectory: new URL('.', import.meta.url).pathname,
+  recommendedConfig: js.configs.recommended,
+});
 
 export default [
-  ...nx.configs['flat/base'],
-  ...nx.configs['flat/typescript'],
-  ...nx.configs['flat/javascript'],
+  { plugins: { '@nx': nxEslintPlugin } },
+  ...compat
+    .config({
+      extends: ['airbnb-typescript', 'plugin:@nx/typescript'],
+      parserOptions: {
+        project: './tsconfig.base.json',
+      },
+    })
+    .map((config) => ({
+      ...config,
+      files: ['**/*.ts', '**/*.tsx'],
+      rules: {
+        ...config.rules,
+        'react/react-in-jsx-scope': 'off',
+        '@typescript-eslint/no-unused-vars': 'error',
+        // Disable some overly strict Airbnb rules for development speed
+        'import/prefer-default-export': 'off',
+        'react/function-component-definition': 'off',
+      },
+    })),
+  ...compat
+    .config({
+      extends: ['plugin:@nx/javascript'],
+    })
+    .map((config) => ({
+      ...config,
+      files: ['**/*.js', '**/*.jsx'],
+      rules: {
+        ...config.rules,
+      },
+    })),
   {
     ignores: [
       '**/dist',
@@ -18,7 +53,7 @@ export default [
         'error',
         {
           enforceBuildableLibDependency: true,
-          allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?js$'],
+          allow: ['^.*/eslint(.base)?.config.[cm]?js$'],
           depConstraints: [
             {
               sourceTag: '*',
