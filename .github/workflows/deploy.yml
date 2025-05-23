@@ -26,7 +26,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build
-        run: yarn nx build theme-editor --configuration=github-pages -W
+        run: yarn nx build theme-editor --configuration=github-pages
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
