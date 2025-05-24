@@ -9,9 +9,11 @@ import {
   Button,
   Stack,
 } from '@mui/material';
-import { useFormContext, Controller } from 'react-hook-form';
+import { useFormContext, Controller, useFieldArray } from 'react-hook-form';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import DownloadIcon from '@mui/icons-material/Download';
+import AddIcon from '@mui/icons-material/Add';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useState, useEffect } from 'react';
 import MuiAlert from '@mui/material/Alert';
 import { loadFont } from '../../utils/loadFont';
@@ -22,11 +24,44 @@ import {
   MIN_SCALE,
   MAX_SCALE,
   defaultThemeValues,
+  ComponentOverride,
 } from '../../types/theme';
 import ColorInput from '../inputs/ColorInput';
 import ColorItem from './ColorItem';
+import ComponentOverrideDialog from './ComponentOverrideDialog';
+import ComponentOverrideItem from './ComponentOverrideItem';
 
 function generateThemeCode(data: ThemeFormData) {
+  // Generate components overrides
+  const componentsCode =
+    data.components && data.components.length > 0
+      ? `  components: {
+${data.components
+  .map((override) => {
+    const parts: string[] = [];
+
+    if (override.defaultProps) {
+      parts.push(
+        `      defaultProps: ${JSON.stringify(override.defaultProps, null, 8)}`
+      );
+    }
+
+    if (override.styleOverrides) {
+      const styleStr = JSON.stringify(override.styleOverrides, null, 8)
+        .split('\n')
+        .map((line) => '      ' + line)
+        .join('\n');
+      parts.push(`      styleOverrides: ${styleStr}`);
+    }
+
+    return `    Mui${override.component}: {
+${parts.join(',\n')}
+    }`;
+  })
+  .join(',\n')}
+  },`
+      : '';
+
   return `import { createTheme } from '@mui/material/styles';
 
 export const theme = createTheme({
@@ -42,7 +77,7 @@ export const theme = createTheme({
   typography: {
     fontFamily: '${data.typography.fontFamily}',
     fontSize: ${data.typography.fontSize},
-  },
+  },${componentsCode ? '\n' + componentsCode : ''}
 });
 
 // Usage instructions:
@@ -61,6 +96,14 @@ function Sidebar() {
   const { control, watch, setValue, reset } = useFormContext<ThemeFormData>();
   const [copySuccess, setCopySuccess] = useState(false);
   const [resetMessage, setResetMessage] = useState(false);
+  const [overrideDialogOpen, setOverrideDialogOpen] = useState(false);
+  const [editingOverride, setEditingOverride] =
+    useState<ComponentOverride | null>(null);
+
+  const { fields, append, update, remove } = useFieldArray({
+    control,
+    name: 'components',
+  });
 
   const watchedValues = watch();
   const themeCode = generateThemeCode(watchedValues);
@@ -99,6 +142,34 @@ function Sidebar() {
     reset(defaultThemeValues);
     setResetMessage(true);
     setTimeout(() => setResetMessage(false), 2000);
+  };
+
+  const handleOpenOverrideDialog = () => {
+    setEditingOverride(null);
+    setOverrideDialogOpen(true);
+  };
+
+  const handleEditOverride = (override: ComponentOverride) => {
+    setEditingOverride(override);
+    setOverrideDialogOpen(true);
+  };
+
+  const handleSaveOverride = (override: ComponentOverride) => {
+    if (editingOverride) {
+      const index = fields.findIndex((field) => field.id === override.id);
+      if (index !== -1) {
+        update(index, override);
+      }
+    } else {
+      append(override);
+    }
+  };
+
+  const handleDeleteOverride = (id: string) => {
+    const index = fields.findIndex((field) => field.id === id);
+    if (index !== -1) {
+      remove(index);
+    }
   };
 
   // Load font when font family changes
@@ -204,6 +275,59 @@ function Sidebar() {
 
       <Divider sx={{ my: 2 }} />
 
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <SettingsIcon sx={{ mr: 1 }} />
+        <Typography variant="subtitle2" sx={{ flexGrow: 1 }}>
+          Component Overrides
+        </Typography>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<AddIcon />}
+          onClick={handleOpenOverrideDialog}
+        >
+          Add Override
+        </Button>
+      </Box>
+
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Customize default props and styles for specific MUI components. These
+        settings will apply globally to all instances of the selected
+        components.
+      </Typography>
+
+      {fields.length === 0 ? (
+        <Box
+          sx={{
+            border: '2px dashed',
+            borderColor: 'divider',
+            borderRadius: 1,
+            p: 3,
+            textAlign: 'center',
+            bgcolor: 'background.default',
+          }}
+        >
+          <SettingsIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
+          <Typography variant="body2" color="text.secondary">
+            No component overrides yet. Add your first override to customize
+            component defaults.
+          </Typography>
+        </Box>
+      ) : (
+        <Box sx={{ maxHeight: 200, overflow: 'auto', mb: 2 }}>
+          {fields.map((field, index) => (
+            <ComponentOverrideItem
+              key={field.id}
+              override={field}
+              onEdit={handleEditOverride}
+              onDelete={handleDeleteOverride}
+            />
+          ))}
+        </Box>
+      )}
+
+      <Divider sx={{ my: 2 }} />
+
       <Typography variant="subtitle2" gutterBottom>
         Export Theme
       </Typography>
@@ -255,6 +379,13 @@ function Sidebar() {
           Reset to Defaults
         </Button>
       </Stack>
+
+      <ComponentOverrideDialog
+        open={overrideDialogOpen}
+        onClose={() => setOverrideDialogOpen(false)}
+        onSave={handleSaveOverride}
+        editingOverride={editingOverride}
+      />
     </Box>
   );
 }

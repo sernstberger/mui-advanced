@@ -1,6 +1,16 @@
 import { darken, lighten, rgbToHex } from '@mui/material/styles';
 import { z } from 'zod';
 
+// Component override types
+export const ComponentOverrideSchema = z.object({
+  id: z.string(),
+  component: z.string(),
+  defaultProps: z.record(z.any()).optional(),
+  styleOverrides: z.record(z.any()).optional(),
+});
+
+export type ComponentOverride = z.infer<typeof ComponentOverrideSchema>;
+
 export const ThemeFormSchema = z.object({
   palette: z.object({
     primary: z.object({
@@ -45,6 +55,7 @@ export const ThemeFormSchema = z.object({
     fontFamily: z.enum(['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans']),
     fontSize: z.number().min(8).max(24),
   }),
+  components: z.array(ComponentOverrideSchema).default([]),
 });
 
 export type ThemeFormData = z.infer<typeof ThemeFormSchema>;
@@ -59,6 +70,104 @@ export const FONT_FAMILIES = [
   'Helvetica',
   'Open Sans',
 ] as const;
+
+// MUI Components for overrides
+export const MUI_COMPONENTS = [
+  'Button',
+  'TextField',
+  'Paper',
+  'Card',
+  'AppBar',
+  'Drawer',
+  'Typography',
+  'Chip',
+  'Avatar',
+  'Dialog',
+  'Alert',
+  'Switch',
+  'Checkbox',
+  'Radio',
+  'Slider',
+  'Fab',
+  'IconButton',
+  'Tooltip',
+  'Snackbar',
+  'Accordion',
+] as const;
+
+// Common props for MUI components
+export const COMPONENT_PROPS: Record<string, Record<string, any>> = {
+  Button: {
+    variant: ['contained', 'outlined', 'text'],
+    size: ['small', 'medium', 'large'],
+    color: ['primary', 'secondary', 'error', 'warning', 'info', 'success'],
+    disableRipple: [true, false],
+    disableElevation: [true, false],
+    fullWidth: [true, false],
+  },
+  TextField: {
+    variant: ['outlined', 'filled', 'standard'],
+    size: ['small', 'medium'],
+    fullWidth: [true, false],
+    multiline: [true, false],
+    required: [true, false],
+    disabled: [true, false],
+  },
+  Paper: {
+    variant: ['elevation', 'outlined'],
+    elevation: [0, 1, 2, 3, 4, 5, 6, 8, 12, 16, 24],
+    square: [true, false],
+  },
+  Card: {
+    variant: ['elevation', 'outlined'],
+    raised: [true, false],
+  },
+  Typography: {
+    variant: [
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'subtitle1',
+      'subtitle2',
+      'body1',
+      'body2',
+      'caption',
+      'overline',
+    ],
+    align: ['left', 'center', 'right', 'justify'],
+    gutterBottom: [true, false],
+    noWrap: [true, false],
+  },
+  Chip: {
+    variant: ['filled', 'outlined'],
+    size: ['small', 'medium'],
+    color: [
+      'default',
+      'primary',
+      'secondary',
+      'error',
+      'info',
+      'success',
+      'warning',
+    ],
+    clickable: [true, false],
+    deletable: [true, false],
+  },
+  Switch: {
+    size: ['small', 'medium'],
+    color: ['primary', 'secondary', 'error', 'warning', 'info', 'success'],
+    disabled: [true, false],
+  },
+  Checkbox: {
+    size: ['small', 'medium'],
+    color: ['primary', 'secondary', 'error', 'warning', 'info', 'success'],
+    disabled: [true, false],
+    indeterminate: [true, false],
+  },
+};
 
 export const defaultThemeValues: ThemeFormData = {
   palette: {
@@ -104,4 +213,5 @@ export const defaultThemeValues: ThemeFormData = {
     fontFamily: 'Roboto',
     fontSize: 14,
   },
+  components: [],
 };
