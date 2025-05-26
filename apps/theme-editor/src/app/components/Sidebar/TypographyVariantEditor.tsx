@@ -20,6 +20,7 @@ import {
   ThemeFormData,
   DEFAULT_TYPOGRAPHY_VARIANTS,
 } from '../../types/theme';
+import SizeInput from '../inputs/SizeInput';
 
 const FONT_WEIGHTS = [
   { value: 100, label: '100 - Thin' },
@@ -145,14 +146,12 @@ function TypographyVariantEditor({ variant }: TypographyVariantEditorProps) {
             control={control}
             render={({ field }) => (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
+                <SizeInput
                   label="Font Size"
-                  size="small"
                   value={field.value || ''}
                   onChange={field.onChange}
-                  fullWidth
                   placeholder={defaults?.fontSize}
-                  helperText={`MUI default: ${defaults?.fontSize}. Use CSS units like rem, px, em`}
+                  helperText={`MUI default: ${defaults?.fontSize}`}
                 />
                 <ResetButton
                   fieldName="fontSize"
@@ -167,19 +166,21 @@ function TypographyVariantEditor({ variant }: TypographyVariantEditorProps) {
             control={control}
             render={({ field }) => (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
+                <SizeInput
                   label="Line Height"
-                  size="small"
-                  value={field.value || ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    // Try to parse as number, otherwise keep as string
+                  value={String(field.value || '')}
+                  onChange={(value) => {
+                    // Try to parse as number for unitless values, otherwise keep as string
                     const numValue = parseFloat(value);
-                    field.onChange(isNaN(numValue) ? value : numValue);
+                    field.onChange(
+                      isNaN(numValue) && value !== ''
+                        ? value
+                        : numValue || value
+                    );
                   }}
-                  fullWidth
                   placeholder={String(defaults?.lineHeight)}
-                  helperText={`MUI default: ${defaults?.lineHeight}. Number (multiplier) or CSS unit`}
+                  helperText={`MUI default: ${defaults?.lineHeight}. Can be unitless (multiplier) or with CSS units`}
+                  allowUnitless={true}
                 />
                 <ResetButton
                   fieldName="lineHeight"
@@ -194,14 +195,12 @@ function TypographyVariantEditor({ variant }: TypographyVariantEditorProps) {
             control={control}
             render={({ field }) => (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
+                <SizeInput
                   label="Letter Spacing"
-                  size="small"
                   value={field.value || ''}
                   onChange={field.onChange}
-                  fullWidth
                   placeholder={defaults?.letterSpacing}
-                  helperText={`MUI default: ${defaults?.letterSpacing}. CSS units like em, px`}
+                  helperText={`MUI default: ${defaults?.letterSpacing}`}
                 />
                 <ResetButton
                   fieldName="letterSpacing"
