@@ -3,7 +3,7 @@ import { Theme, ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { useEffect, useState } from 'react';
 import { useWatch, useFormContext } from 'react-hook-form';
-import { ThemeFormData } from '../types/theme';
+import { ThemeFormData, TYPOGRAPHY_VARIANTS } from '../types/theme';
 import { Box } from '@mui/material';
 
 function Preview() {
@@ -14,6 +14,25 @@ function Preview() {
   // Update preview theme when form values change
   useEffect(() => {
     if (watchedValues?.palette && watchedValues?.typography) {
+      // Build typography variants object
+      const typographyVariants: any = {};
+      if (watchedValues.typography) {
+        TYPOGRAPHY_VARIANTS.forEach((variant) => {
+          const variantData = watchedValues.typography![variant];
+          if (variantData) {
+            // Only include non-empty values
+            const cleanVariantData = Object.fromEntries(
+              Object.entries(variantData).filter(
+                ([_, value]) => value !== undefined && value !== ''
+              )
+            );
+            if (Object.keys(cleanVariantData).length > 0) {
+              typographyVariants[variant] = cleanVariantData;
+            }
+          }
+        });
+      }
+
       const newTheme = createTheme({
         palette: {
           mode: watchedValues.palette.mode,
@@ -43,6 +62,7 @@ function Preview() {
         typography: {
           fontFamily: watchedValues.typography.fontFamily || 'Roboto',
           fontSize: watchedValues.typography.fontSize || 14,
+          ...typographyVariants,
         },
       });
       setPreviewTheme(newTheme);

@@ -25,11 +25,13 @@ import {
   MAX_SCALE,
   defaultThemeValues,
   ComponentOverride,
+  TYPOGRAPHY_VARIANTS,
 } from '../../types/theme';
 import ColorInput from '../inputs/ColorInput';
 import ColorItem from './ColorItem';
 import ComponentOverrideDialog from './ComponentOverrideDialog';
 import ComponentOverrideItem from './ComponentOverrideItem';
+import TypographyVariantEditor from './TypographyVariantEditor';
 
 function generateThemeCode(data: ThemeFormData) {
   // Generate components overrides
@@ -62,6 +64,29 @@ ${parts.join(',\n')}
   },`
       : '';
 
+  // Generate typography variants code
+  const typographyVariants = TYPOGRAPHY_VARIANTS.filter(
+    (variant) => data.typography[variant]
+  )
+    .map((variant) => {
+      const variantData = data.typography[variant];
+      if (!variantData) return '';
+
+      const cleanVariantData = Object.fromEntries(
+        Object.entries(variantData).filter(
+          ([_, value]) => value !== undefined && value !== ''
+        )
+      );
+
+      if (Object.keys(cleanVariantData).length === 0) return '';
+
+      return `    ${variant}: ${JSON.stringify(cleanVariantData, null, 6)}`;
+    })
+    .filter(Boolean);
+
+  const typographyVariantsCode =
+    typographyVariants.length > 0 ? `,\n${typographyVariants.join(',\n')}` : '';
+
   return `import { createTheme } from '@mui/material/styles';
 
 export const theme = createTheme({
@@ -76,7 +101,7 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: '${data.typography.fontFamily}',
-    fontSize: ${data.typography.fontSize},
+    fontSize: ${data.typography.fontSize}${typographyVariantsCode}
   },${componentsCode ? '\n' + componentsCode : ''}
 });
 
@@ -272,6 +297,17 @@ function Sidebar() {
         valueLabelDisplay="auto"
         valueLabelFormat={(v) => `${(v * 100).toFixed(0)}%`}
       />
+
+      <Typography variant="body2" sx={{ mt: 2, mb: 1, fontWeight: 500 }}>
+        Typography Variants
+      </Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        Customize individual typography variants like headings, body text, etc.
+      </Typography>
+
+      {TYPOGRAPHY_VARIANTS.map((variant) => (
+        <TypographyVariantEditor key={variant} variant={variant} />
+      ))}
 
       <Divider sx={{ my: 2 }} />
 

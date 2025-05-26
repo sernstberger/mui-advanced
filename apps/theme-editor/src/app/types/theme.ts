@@ -1,6 +1,15 @@
 import { darken, lighten, rgbToHex } from '@mui/material/styles';
 import { z } from 'zod';
 
+// Typography variant schema
+const TypographyVariantSchema = z.object({
+  fontFamily: z.string().optional(),
+  fontWeight: z.union([z.number(), z.string()]).optional(),
+  fontSize: z.string().optional(),
+  lineHeight: z.union([z.number(), z.string()]).optional(),
+  letterSpacing: z.string().optional(),
+});
+
 // Component override types
 export const ComponentOverrideSchema = z.object({
   id: z.string(),
@@ -54,11 +63,24 @@ export const ThemeFormSchema = z.object({
   typography: z.object({
     fontFamily: z.enum(['Roboto', 'Inter', 'Arial', 'Helvetica', 'Open Sans']),
     fontSize: z.number().min(8).max(24),
+    h1: TypographyVariantSchema.optional(),
+    h2: TypographyVariantSchema.optional(),
+    h3: TypographyVariantSchema.optional(),
+    h4: TypographyVariantSchema.optional(),
+    h5: TypographyVariantSchema.optional(),
+    h6: TypographyVariantSchema.optional(),
+    subtitle1: TypographyVariantSchema.optional(),
+    subtitle2: TypographyVariantSchema.optional(),
+    body1: TypographyVariantSchema.optional(),
+    body2: TypographyVariantSchema.optional(),
+    caption: TypographyVariantSchema.optional(),
+    overline: TypographyVariantSchema.optional(),
   }),
   components: z.array(ComponentOverrideSchema).default([]),
 });
 
 export type ThemeFormData = z.infer<typeof ThemeFormSchema>;
+export type TypographyVariant = z.infer<typeof TypographyVariantSchema>;
 
 export const BASE_FONT_SIZE = 14;
 export const MIN_SCALE = 0.8;
@@ -70,6 +92,110 @@ export const FONT_FAMILIES = [
   'Helvetica',
   'Open Sans',
 ] as const;
+
+// Typography variants list
+export const TYPOGRAPHY_VARIANTS = [
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'subtitle1',
+  'subtitle2',
+  'body1',
+  'body2',
+  'caption',
+  'overline',
+] as const;
+
+// Default typography variant values based on MUI defaults
+export const DEFAULT_TYPOGRAPHY_VARIANTS: Record<string, TypographyVariant> = {
+  h1: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 300,
+    fontSize: '6rem',
+    lineHeight: 1.167,
+    letterSpacing: '-0.01562em',
+  },
+  h2: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 300,
+    fontSize: '3.75rem',
+    lineHeight: 1.2,
+    letterSpacing: '-0.00833em',
+  },
+  h3: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '3rem',
+    lineHeight: 1.167,
+    letterSpacing: '0em',
+  },
+  h4: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '2.125rem',
+    lineHeight: 1.235,
+    letterSpacing: '0.00735em',
+  },
+  h5: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '1.5rem',
+    lineHeight: 1.334,
+    letterSpacing: '0em',
+  },
+  h6: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 500,
+    fontSize: '1.25rem',
+    lineHeight: 1.6,
+    letterSpacing: '0.0075em',
+  },
+  subtitle1: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '1rem',
+    lineHeight: 1.75,
+    letterSpacing: '0.00938em',
+  },
+  subtitle2: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 500,
+    fontSize: '0.875rem',
+    lineHeight: 1.57,
+    letterSpacing: '0.00714em',
+  },
+  body1: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '1rem',
+    lineHeight: 1.5,
+    letterSpacing: '0.00938em',
+  },
+  body2: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '0.875rem',
+    lineHeight: 1.43,
+    letterSpacing: '0.01071em',
+  },
+  caption: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '0.75rem',
+    lineHeight: 1.66,
+    letterSpacing: '0.03333em',
+  },
+  overline: {
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 400,
+    fontSize: '0.75rem',
+    lineHeight: 2.66,
+    letterSpacing: '0.08333em',
+  },
+};
 
 // MUI Components for overrides
 export const MUI_COMPONENTS = [
@@ -212,6 +338,7 @@ export const defaultThemeValues: ThemeFormData = {
   typography: {
     fontFamily: 'Roboto',
     fontSize: 14,
+    ...DEFAULT_TYPOGRAPHY_VARIANTS,
   },
   components: [],
 };
