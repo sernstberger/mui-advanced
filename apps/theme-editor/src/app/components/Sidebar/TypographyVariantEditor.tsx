@@ -21,6 +21,7 @@ import {
   DEFAULT_TYPOGRAPHY_VARIANTS,
 } from '../../types/theme';
 import SizeInput from '../inputs/SizeInput';
+import { SelectInput } from '@mui-advanced/form';
 
 const FONT_WEIGHTS = [
   { value: 100, label: '100 - Thin' },
@@ -80,27 +81,13 @@ function TypographyVariantEditor({ variant }: TypographyVariantEditorProps) {
             control={control}
             render={({ field }) => (
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
-                  select
+                <SelectInput
+                  name={`typography.${variant}.fontFamily`}
                   label="Font Family"
-                  value={field.value || ''}
-                  onChange={field.onChange}
-                  fullWidth
+                  options={FONT_FAMILIES}
                   placeholder={defaults?.fontFamily}
                   helperText={`MUI default: ${defaults?.fontFamily}`}
-                >
-                  <MenuItem value="">
-                    <em>Use MUI Default</em>
-                  </MenuItem>
-                  {FONT_FAMILIES.map((family) => (
-                    <MenuItem
-                      key={family}
-                      value={`"${family}", "Helvetica", "Arial", sans-serif`}
-                    >
-                      {family}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                />
                 <ResetButton
                   fieldName="fontFamily"
                   defaultValue={defaults?.fontFamily}

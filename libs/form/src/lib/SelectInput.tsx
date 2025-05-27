@@ -5,49 +5,48 @@ import {
   MenuItem,
   FormHelperText,
 } from '@mui/material';
-import { Controller, useFormContext } from 'react-hook-form';
-import type { ThemeFormData } from '../../types/theme';
+import { Controller } from 'react-hook-form';
 
 interface SelectInputProps<T extends string> {
   name: string;
   label: string;
   options: readonly T[];
+  placeholder?: string;
+  helperText?: string;
 }
 
-const SelectInput = <T extends string>({
+export const SelectInput = <T extends string>({
   name,
   label,
   options,
+  placeholder,
+  helperText,
 }: SelectInputProps<T>) => {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext<ThemeFormData>();
-  const error = name
-    .split('.')
-    .reduce((acc, key) => (acc ? acc[key] : undefined), errors as any);
-
   return (
     <Controller
-      name={name as any}
-      control={control}
-      render={({ field }) => (
+      name={name}
+      render={({ field, fieldState: { error } }) => (
         <FormControl fullWidth size="small" error={!!error}>
           <Typography variant="body2" gutterBottom>
             {label}
           </Typography>
           <Select {...field} label={label}>
+            {placeholder && (
+              <MenuItem value="">
+                <em>{placeholder}</em>
+              </MenuItem>
+            )}
             {options.map((option) => (
               <MenuItem key={option} value={option}>
                 {option}
               </MenuItem>
             ))}
           </Select>
-          {error && <FormHelperText>{error.message}</FormHelperText>}
+          {(error || helperText) && (
+            <FormHelperText>{error?.message || helperText}</FormHelperText>
+          )}
         </FormControl>
       )}
     />
   );
 };
-
-export default SelectInput;

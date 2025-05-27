@@ -1,6 +1,7 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import nxEslintPlugin from '@nx/eslint-plugin';
+import tseslint from 'typescript-eslint';
 
 const compat = new FlatCompat({
   baseDirectory: new URL('.', import.meta.url).pathname,
@@ -9,6 +10,7 @@ const compat = new FlatCompat({
 
 export default [
   { plugins: { '@nx': nxEslintPlugin } },
+  ...tseslint.configs.recommended,
   ...compat
     .config({
       extends: ['airbnb-typescript', 'plugin:@nx/typescript'],

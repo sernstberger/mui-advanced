@@ -8,6 +8,9 @@
     },
     {
       "path": "./apps/theme-editor"
+    },
+    {
+      "path": "./libs/form"
     }
   ]
 }
