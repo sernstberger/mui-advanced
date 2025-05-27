@@ -185,6 +185,8 @@ const PreviewGrid = () => {
           <li>Tabs</li>
         </ul>
 
+        <Divider sx={{ my: 4 }} />
+
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }}>
             <PaletteSection />
