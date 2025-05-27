@@ -1835,6 +1835,18 @@
   dependencies:
     "@babel/runtime" "^7.27.1"
 
+"@mui/lab@^7.0.0-beta.12":
+  version "7.0.0-beta.12"
+  resolved "https://registry.yarnpkg.com/@mui/lab/-/lab-7.0.0-beta.12.tgz#e0fc97760786814c51ff4714d5c7c1c03e264fbd"
+  integrity sha512-685MmzByCy3Vmb7xI6J8qOQm4l7yqfVTOLwxVmNV1EHBKuJiMuoX4/2vAAEGfNbDeEfWQsp7aBWanYpSWe1iRA==
+  dependencies:
+    "@babel/runtime" "^7.27.1"
+    "@mui/system" "^7.1.0"
+    "@mui/types" "^7.4.2"
+    "@mui/utils" "^7.1.0"
+    clsx "^2.1.1"
+    prop-types "^15.8.1"
+
 "@mui/material@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@mui/material/-/material-7.1.0.tgz#f25866fb507ada2a2b3ac433b13a2bc79d83f608"
@@ -1895,7 +1907,7 @@
   dependencies:
     "@babel/runtime" "^7.27.1"
 
-"@mui/utils@^7.1.0":
+"@mui/utils@^7.0.2", "@mui/utils@^7.1.0":
   version "7.1.0"
   resolved "https://registry.yarnpkg.com/@mui/utils/-/utils-7.1.0.tgz#464c0c1bc8f57c07d934ac674f3dcc81ac24f68b"
   integrity sha512-/OM3S8kSHHmWNOP+NH9xEtpYSG10upXeQ0wLZnfDgmgadTAk5F4MQfFLyZ5FCRJENB3eRzltMmaNl6UtDnPovw==
@@ -1906,6 +1918,27 @@
     clsx "^2.1.1"
     prop-types "^15.8.1"
     react-is "^19.1.0"
+
+"@mui/x-date-pickers@^8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-8.4.0.tgz#ae1da45c760258d59c842a92333a28dfceab009a"
+  integrity sha512-x7jI7JnKK25xL3yjD2Z1r86gAWtabKj9ogI2WDKd/v9WwE1VxmDD/NTiXprEZFo9psPOoqr+juPGDz5Cb2v7jw==
+  dependencies:
+    "@babel/runtime" "^7.27.1"
+    "@mui/utils" "^7.0.2"
+    "@mui/x-internals" "8.4.0"
+    "@types/react-transition-group" "^4.4.12"
+    clsx "^2.1.1"
+    prop-types "^15.8.1"
+    react-transition-group "^4.4.5"
+
+"@mui/x-internals@8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@mui/x-internals/-/x-internals-8.4.0.tgz#593b36cab7050fe1e4ca8dc3ce455349a3edae5d"
+  integrity sha512-Z7FCahC4MLfTVzEwnKOB7P1fiR9DzFuMzHOPRNaMXc/rsS7unbtBKAG94yvsRzReCyjzZUVA7h37lnQ1DoPKJw==
+  dependencies:
+    "@babel/runtime" "^7.27.1"
+    "@mui/utils" "^7.0.2"
 
 "@napi-rs/nice-android-arm-eabi@1.0.1":
   version "1.0.1"
@@ -4454,7 +4487,7 @@ date-format@^4.0.14:
   resolved "https://registry.yarnpkg.com/date-format/-/date-format-4.0.14.tgz#7a8e584434fb169a521c8b7aa481f355810d9400"
   integrity sha512-39BOQLs9ZjKh0/patS9nrT8wc3ioX3/eA/zgbKNopnF2wCqJEoxywwwElATYvRsXdnOxA/OQeQoFZ3rFjVajhg==
 
-dayjs@^1.10.4:
+dayjs@^1.10.4, dayjs@^1.11.13:
   version "1.11.13"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.13.tgz#92430b0139055c3ebb60150aa13e860a4b5a366c"
   integrity sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==
