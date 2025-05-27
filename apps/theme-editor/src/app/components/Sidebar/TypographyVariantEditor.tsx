@@ -83,7 +83,6 @@ function TypographyVariantEditor({ variant }: TypographyVariantEditorProps) {
                 <TextField
                   select
                   label="Font Family"
-                  size="small"
                   value={field.value || ''}
                   onChange={field.onChange}
                   fullWidth
@@ -141,74 +140,45 @@ function TypographyVariantEditor({ variant }: TypographyVariantEditorProps) {
             )}
           />
 
-          <Controller
-            name={`typography.${variant}.fontSize` as any}
-            control={control}
-            render={({ field }) => (
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <SizeInput
-                  label="Font Size"
-                  value={field.value || ''}
-                  onChange={field.onChange}
-                  placeholder={defaults?.fontSize}
-                  helperText={`MUI default: ${defaults?.fontSize}`}
-                />
-                <ResetButton
-                  fieldName="fontSize"
-                  defaultValue={defaults?.fontSize}
-                />
-              </Box>
-            )}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <SizeInput
+              name={`typography.${variant}.fontSize`}
+              label="Font Size"
+              placeholder={defaults?.fontSize}
+              helperText={`MUI default: ${defaults?.fontSize}`}
+            />
+            <ResetButton
+              fieldName="fontSize"
+              defaultValue={defaults?.fontSize}
+            />
+          </Box>
 
-          <Controller
-            name={`typography.${variant}.lineHeight` as any}
-            control={control}
-            render={({ field }) => (
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <SizeInput
-                  label="Line Height"
-                  value={String(field.value || '')}
-                  onChange={(value) => {
-                    // Try to parse as number for unitless values, otherwise keep as string
-                    const numValue = parseFloat(value);
-                    field.onChange(
-                      isNaN(numValue) && value !== ''
-                        ? value
-                        : numValue || value
-                    );
-                  }}
-                  placeholder={String(defaults?.lineHeight)}
-                  helperText={`MUI default: ${defaults?.lineHeight}. Can be unitless (multiplier) or with CSS units`}
-                  allowUnitless={true}
-                />
-                <ResetButton
-                  fieldName="lineHeight"
-                  defaultValue={defaults?.lineHeight}
-                />
-              </Box>
-            )}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <SizeInput
+              name={`typography.${variant}.lineHeight`}
+              label="Line Height"
+              placeholder={String(defaults?.lineHeight)}
+              helperText={`MUI default: ${defaults?.lineHeight}. Can be unitless (multiplier) or with CSS units`}
+              allowUnitless={true}
+            />
+            <ResetButton
+              fieldName="lineHeight"
+              defaultValue={defaults?.lineHeight}
+            />
+          </Box>
 
-          <Controller
-            name={`typography.${variant}.letterSpacing` as any}
-            control={control}
-            render={({ field }) => (
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <SizeInput
-                  label="Letter Spacing"
-                  value={field.value || ''}
-                  onChange={field.onChange}
-                  placeholder={defaults?.letterSpacing}
-                  helperText={`MUI default: ${defaults?.letterSpacing}`}
-                />
-                <ResetButton
-                  fieldName="letterSpacing"
-                  defaultValue={defaults?.letterSpacing}
-                />
-              </Box>
-            )}
-          />
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <SizeInput
+              name={`typography.${variant}.letterSpacing`}
+              label="Letter Spacing"
+              placeholder={defaults?.letterSpacing}
+              helperText={`MUI default: ${defaults?.letterSpacing}`}
+            />
+            <ResetButton
+              fieldName="letterSpacing"
+              defaultValue={defaults?.letterSpacing}
+            />
+          </Box>
         </Stack>
       </AccordionDetails>
     </Accordion>
