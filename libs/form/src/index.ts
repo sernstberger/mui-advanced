@@ -1,1 +1,1 @@
-export * from './lib/SelectInput';
+export * from './lib/ConnectedTextInput';
