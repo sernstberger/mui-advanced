@@ -13,7 +13,7 @@ export default [
   ...tseslint.configs.recommended,
   ...compat
     .config({
-      extends: ['airbnb-typescript', 'plugin:@nx/typescript'],
+      extends: ['plugin:@nx/typescript'],
       parserOptions: {
         project: ['./tsconfig.base.json', 'libs/form/tsconfig.storybook.json'],
       },
@@ -25,9 +25,6 @@ export default [
         ...config.rules,
         'react/react-in-jsx-scope': 'off',
         '@typescript-eslint/no-unused-vars': 'error',
-        // Disable some overly strict Airbnb rules for development speed
-        'import/prefer-default-export': 'off',
-        'react/function-component-definition': 'off',
       },
     })),
   ...compat
