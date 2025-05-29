@@ -1,1 +1,1 @@
-export * from './lib/ConnectedTextInput';
+export * from './lib/ConnectedTextInput/ConnectedTextInput';
