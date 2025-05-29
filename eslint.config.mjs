@@ -15,7 +15,7 @@ export default [
     .config({
       extends: ['airbnb-typescript', 'plugin:@nx/typescript'],
       parserOptions: {
-        project: './tsconfig.base.json',
+        project: ['./tsconfig.base.json', 'libs/form/tsconfig.storybook.json'],
       },
     })
     .map((config) => ({
