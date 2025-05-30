@@ -1,30 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ConnectedSwitch } from './ConnectedSwitch';
-import { FormProvider, useForm } from 'react-hook-form';
 import { action } from '@storybook/addon-actions';
-
-function StoryWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(action('form-submit'))}>
-        {children}
-        <button type="submit" style={{ marginTop: '1rem' }}>
-          Submit
-        </button>
-      </form>
-    </FormProvider>
-  );
-}
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 const meta: Meta<typeof ConnectedSwitch> = {
   title: 'Form/ConnectedSwitch',
   component: ConnectedSwitch,
   decorators: [
     (Story) => (
-      <StoryWrapper>
-        <Story />
-      </StoryWrapper>
+      <ConnectedForm onSubmit={action('form-submit')}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            maxWidth: '400px',
+          }}
+        >
+          <Story />
+          <button type="submit" style={{ marginTop: '1rem' }}>
+            Submit
+          </button>
+        </div>
+      </ConnectedForm>
     ),
   ],
   parameters: {

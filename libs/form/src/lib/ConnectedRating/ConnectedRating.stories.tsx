@@ -1,31 +1,29 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ConnectedRating } from './ConnectedRating';
-import { FormProvider, useForm } from 'react-hook-form';
 import { action } from '@storybook/addon-actions';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 import { Favorite } from '@mui/icons-material';
-
-function StoryWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(action('form-submit'))}>
-        {children}
-        <button type="submit" style={{ marginTop: '1rem' }}>
-          Submit
-        </button>
-      </form>
-    </FormProvider>
-  );
-}
 
 const meta: Meta<typeof ConnectedRating> = {
   title: 'Form/ConnectedRating',
   component: ConnectedRating,
   decorators: [
     (Story) => (
-      <StoryWrapper>
-        <Story />
-      </StoryWrapper>
+      <ConnectedForm onSubmit={action('form-submit')}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            maxWidth: '400px',
+          }}
+        >
+          <Story />
+          <button type="submit" style={{ marginTop: '1rem' }}>
+            Submit
+          </button>
+        </div>
+      </ConnectedForm>
     ),
   ],
   parameters: {

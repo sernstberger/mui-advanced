@@ -1,10 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FormProvider, useForm } from 'react-hook-form';
+import { vi } from 'vitest';
 import {
   ConnectedAutocomplete,
   AutocompleteOption,
 } from './ConnectedAutocomplete';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 const mockOptions: AutocompleteOption[] = [
   { value: '1', label: 'Option 1' },
@@ -21,17 +22,10 @@ function TestWrapper({
   defaultValues?: Record<string, any>;
   onSubmit?: (data: any) => void;
 }) {
-  const methods = useForm({ defaultValues });
-
   return (
-    <FormProvider {...methods}>
-      <form
-        onSubmit={onSubmit ? methods.handleSubmit(onSubmit) : undefined}
-        noValidate
-      >
-        {children}
-      </form>
-    </FormProvider>
+    <ConnectedForm formProps={{ defaultValues }} onSubmit={onSubmit}>
+      {children}
+    </ConnectedForm>
   );
 }
 

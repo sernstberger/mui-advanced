@@ -1,14 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { ConnectedSlider } from './ConnectedSlider';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form>{children}</form>
-    </FormProvider>
-  );
+  return <ConnectedForm>{children}</ConnectedForm>;
 }
 
 describe('ConnectedSlider', () => {

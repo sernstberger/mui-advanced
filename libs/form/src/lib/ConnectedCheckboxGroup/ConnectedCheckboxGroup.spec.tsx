@@ -1,19 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { ConnectedCheckboxGroup } from './ConnectedCheckboxGroup';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
-const options = [
-  { value: '1', label: 'Option 1' },
-  { value: '2', label: 'Option 2' },
+const testOptions = [
+  { value: 'option1', label: 'Option 1' },
+  { value: 'option2', label: 'Option 2' },
+  { value: 'option3', label: 'Option 3' },
 ];
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form>{children}</form>
-    </FormProvider>
-  );
+  return <ConnectedForm>{children}</ConnectedForm>;
 }
 
 describe('ConnectedCheckboxGroup', () => {
@@ -23,7 +19,7 @@ describe('ConnectedCheckboxGroup', () => {
         <ConnectedCheckboxGroup
           name="test"
           label="Test Group"
-          options={options}
+          options={testOptions}
         />
       </TestWrapper>
     );

@@ -1,30 +1,29 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ConnectedSlider } from './ConnectedSlider';
-import { FormProvider, useForm } from 'react-hook-form';
 import { action } from '@storybook/addon-actions';
-
-function StoryWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(action('form-submit'))}>
-        <div style={{ width: '300px', padding: '2rem' }}>{children}</div>
-        <button type="submit" style={{ marginTop: '1rem' }}>
-          Submit
-        </button>
-      </form>
-    </FormProvider>
-  );
-}
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 const meta: Meta<typeof ConnectedSlider> = {
   title: 'Form/ConnectedSlider',
   component: ConnectedSlider,
   decorators: [
     (Story) => (
-      <StoryWrapper>
-        <Story />
-      </StoryWrapper>
+      <ConnectedForm onSubmit={action('form-submit')}>
+        <div
+          style={{
+            width: '300px',
+            padding: '2rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          <Story />
+          <button type="submit" style={{ marginTop: '1rem' }}>
+            Submit
+          </button>
+        </div>
+      </ConnectedForm>
     ),
   ],
   parameters: {

@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { FormProvider, useForm } from 'react-hook-form';
 import { vi } from 'vitest';
 import { ConnectedRadioGroup } from './ConnectedRadioGroup';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
-// Test wrapper component that provides FormProvider context
+// Test wrapper component that provides form context
 function TestWrapper({
   children,
   defaultValues = {},
@@ -14,12 +14,10 @@ function TestWrapper({
   defaultValues?: Record<string, any>;
   onSubmit?: (data: any) => void;
 }) {
-  const methods = useForm({ defaultValues });
-
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(onSubmit)}>{children}</form>
-    </FormProvider>
+    <ConnectedForm formProps={{ defaultValues }} onSubmit={onSubmit}>
+      {children}
+    </ConnectedForm>
   );
 }
 
