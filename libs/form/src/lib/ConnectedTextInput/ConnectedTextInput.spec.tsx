@@ -259,18 +259,7 @@ describe('ConnectedTextInput', () => {
     it('should prevent whitespace-only input', async () => {
       render(
         <TestWrapper>
-          <ConnectedTextInput
-            name="noWhitespace"
-            label="No Whitespace Field"
-            rules={{
-              validate: (value) => {
-                if (!value?.trim()) {
-                  return 'Cannot be empty or whitespace only';
-                }
-                return true;
-              },
-            }}
-          />
+          <ConnectedTextInput name="noWhitespace" label="No Whitespace Field" />
           <button type="submit">Submit</button>
         </TestWrapper>
       );

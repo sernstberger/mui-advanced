@@ -7,7 +7,7 @@
 - [x] Use react-hook-form rules for validation (required, min, max, etc.)
 - [ ] Support custom zod validation functions
 - [ ] All inputs must be wrapped in a form with FormProvider
-- [ ] Prevent whitespace-only input (should fail validation)
+- [x] Prevent whitespace-only input (built into component - no user configuration needed)
 - [ ] Use zod for schema validation
 - [ ] Support controlled and uncontrolled components
 
@@ -112,7 +112,7 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
 - [ ] **should show min/max length errors**: Test length validation
 - [ ] **should show custom validation errors**: Test custom rules
 - [ ] **should show zod validation errors**: Test zod schema validation
-- [ ] **should prevent whitespace-only input**: Test trimmed empty validation
+- [x] **should prevent whitespace-only input**: Test built-in trim validation (no explicit rules needed)
 - [ ] **should clear errors on valid input**: Test error clearing
 - [ ] **should not submit form with validation errors**: Test form submission prevention
 

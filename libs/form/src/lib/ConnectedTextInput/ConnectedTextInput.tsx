@@ -26,10 +26,33 @@ export function ConnectedTextInput({
   rules,
   ...props
 }: ConnectedTextInputProps) {
+  // Built-in validation to prevent whitespace-only input
+  const builtInValidation = (value: string) => {
+    if (value && !value.trim()) {
+      return 'Cannot be empty or whitespace only';
+    }
+    return true;
+  };
+
+  // Combine built-in validation with user-provided validation
+  const combinedRules = {
+    ...rules,
+    validate: {
+      // Built-in trim validation
+      noWhitespaceOnly: builtInValidation,
+      // User-provided validation (if any)
+      ...(typeof rules?.validate === 'function'
+        ? { custom: rules.validate }
+        : typeof rules?.validate === 'object'
+        ? rules.validate
+        : {}),
+    },
+  };
+
   return (
     <Controller
       name={name}
-      rules={rules}
+      rules={combinedRules}
       render={({ field, fieldState }) => {
         const hasError = !!fieldState.error;
 
