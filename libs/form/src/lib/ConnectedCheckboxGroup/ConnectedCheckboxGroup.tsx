@@ -1,17 +1,13 @@
-import { Controller, ControllerProps } from 'react-hook-form';
+import { Controller, ControllerProps, RegisterOptions } from 'react-hook-form';
 import {
-  Checkbox,
   FormControl,
   FormControlLabel,
   FormGroup,
-  FormHelperText,
   FormLabel,
+  FormHelperText,
+  Checkbox,
 } from '@mui/material';
-import {
-  applyDefaultMessages,
-  combineValidationRules,
-  commonValidations,
-} from '../utils/validation';
+import { createValidationRules, commonValidations } from '../utils/validation';
 
 export interface CheckboxOption {
   value: string | number;
@@ -19,75 +15,138 @@ export interface CheckboxOption {
   disabled?: boolean;
 }
 
-export interface ConnectedCheckboxGroupProps {
-  name: string;
-  label: string;
-  hideLabel?: boolean;
-  helperText?: string;
-  required?: boolean;
-  rules?: ControllerProps['rules'];
-  options: CheckboxOption[];
-  row?: boolean;
-}
+export type ConnectedCheckboxGroupProps = Omit<
+  React.ComponentProps<typeof FormGroup>,
+  | 'name'
+  | 'defaultValue'
+  | 'required'
+  | 'min'
+  | 'max'
+  | 'pattern'
+  | 'validate'
+  | 'minLength'
+  | 'maxLength'
+> &
+  RegisterOptions & {
+    name: string;
+    label: string;
+    hideLabel?: boolean;
+    helperText?: string;
+    options: CheckboxOption[];
+    id?: string;
+    'data-testid'?: string;
+  };
 
 export function ConnectedCheckboxGroup({
   name,
   label,
   hideLabel = false,
   helperText,
-  required = false,
-  rules,
   options,
-  row = false,
+  id,
+  'data-testid': dataTestId,
+  // Extract react-hook-form rules from props
+  required,
+  min,
+  max,
+  minLength,
+  maxLength,
+  pattern,
+  validate,
+  valueAsNumber,
+  valueAsDate,
+  setValueAs,
+  shouldUnregister,
+  onChange,
+  onBlur,
+  disabled,
+  deps,
+  ...otherProps
 }: ConnectedCheckboxGroupProps) {
-  // Apply default messages to user rules
-  const rulesWithDefaults = applyDefaultMessages(rules, label, required);
+  const rules = {
+    required,
+    min,
+    max,
+    minLength,
+    maxLength,
+    pattern,
+    validate,
+    valueAsNumber,
+    valueAsDate,
+    setValueAs,
+    shouldUnregister,
+    onChange,
+    onBlur,
+    disabled,
+    deps,
+  };
 
-  // Combine built-in validation with user-provided validation
-  const combinedRules = combineValidationRules(
-    rulesWithDefaults,
-    required
+  // Convert required to boolean for UI (it might be a validation rule object)
+  const isRequired = Boolean(required);
+
+  // Use validation approach that works with zodResolver at form level
+  const validationRules = createValidationRules(
+    isRequired
       ? { atLeastOneSelected: commonValidations.atLeastOneSelected(label) }
       : {},
-    rules
+    rules,
+    label
   );
+
+  // Generate IDs based on custom id or fallback to name
+  const baseId = id || name;
+  const inputId = baseId;
+  const labelId = `${baseId}-label`;
+  const helperTextId = `${baseId}-helper-text`;
+  const errorTextId = `${baseId}-error-text`;
+
+  // Generate data-testids based on custom data-testid or fallback to name
+  const baseTestId = dataTestId || name;
+  const inputTestId = `${baseTestId}-input`;
+  const labelTestId = `${baseTestId}-label`;
+  const helperTextTestId = `${baseTestId}-helper-text`;
+  const errorTextTestId = `${baseTestId}-error-text`;
 
   return (
     <Controller
       name={name}
-      rules={combinedRules}
-      defaultValue={[]}
+      rules={validationRules}
       render={({ field, fieldState }) => {
         const hasError = !!fieldState.error;
         const value = field.value || [];
 
-        const handleChange = (
-          optionValue: string | number,
-          checked: boolean
-        ) => {
-          if (checked) {
-            field.onChange([...value, optionValue]);
-          } else {
-            field.onChange(
-              value.filter((v: string | number) => v !== optionValue)
-            );
-          }
-        };
-
         return (
-          <FormControl error={hasError} required={required}>
-            {!hideLabel && <FormLabel component="legend">{label}</FormLabel>}
-            <FormGroup row={row}>
+          <FormControl error={hasError}>
+            {!hideLabel && (
+              <FormLabel
+                component="legend"
+                required={isRequired}
+                id={labelId}
+                data-testid={labelTestId}
+              >
+                {label}
+              </FormLabel>
+            )}
+            <FormGroup
+              {...otherProps}
+              id={inputId}
+              data-testid={inputTestId}
+              aria-labelledby={!hideLabel ? labelId : undefined}
+              aria-label={hideLabel ? label : undefined}
+            >
               {options.map((option) => (
                 <FormControlLabel
                   key={option.value}
                   control={
                     <Checkbox
                       checked={value.includes(option.value)}
-                      onChange={(_, checked) =>
-                        handleChange(option.value, checked)
-                      }
-                      disabled={option.disabled}
+                      onChange={(event, checked) => {
+                        const newValue = checked
+                          ? [...value, option.value]
+                          : value.filter((v: any) => v !== option.value);
+                        field.onChange(newValue);
+                      }}
+                      disabled={option.disabled || disabled}
                     />
                   }
                   label={option.label}
@@ -95,7 +154,10 @@ export function ConnectedCheckboxGroup({
               ))}
             </FormGroup>
             {(hasError || helperText) && (
-              <FormHelperText>
+              <FormHelperText
+                id={hasError ? errorTextId : helperTextId}
+                data-testid={hasError ? errorTextTestId : helperTextTestId}
+              >
                 {fieldState.error?.message || helperText}
               </FormHelperText>
             )}

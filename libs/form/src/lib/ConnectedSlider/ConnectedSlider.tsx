@@ -1,4 +1,4 @@
-import { Controller, ControllerProps } from 'react-hook-form';
+import { Controller, ControllerProps, RegisterOptions } from 'react-hook-form';
 import {
   FormControl,
   FormHelperText,
@@ -6,65 +6,131 @@ import {
   Slider,
   SliderProps,
 } from '@mui/material';
-import {
-  applyDefaultMessages,
-  combineValidationRules,
-  commonValidations,
-} from '../utils/validation';
+import { createValidationRules, commonValidations } from '../utils/validation';
 
-export interface ConnectedSliderProps
-  extends Omit<SliderProps, 'name' | 'defaultValue'> {
-  name: string;
-  label: string;
-  hideLabel?: boolean;
-  helperText?: string;
-  required?: boolean;
-  rules?: ControllerProps['rules'];
-}
+export type ConnectedSliderProps = Omit<
+  SliderProps,
+  | 'name'
+  | 'defaultValue'
+  | 'required'
+  | 'min'
+  | 'max'
+  | 'pattern'
+  | 'validate'
+  | 'minLength'
+  | 'maxLength'
+> &
+  RegisterOptions & {
+    name: string;
+    label: string;
+    hideLabel?: boolean;
+    helperText?: string;
+    id?: string;
+    'data-testid'?: string;
+  };
 
 export function ConnectedSlider({
   name,
   label,
   hideLabel = false,
   helperText,
-  required = false,
-  rules,
-  ...props
+  id,
+  'data-testid': dataTestId,
+  // Extract react-hook-form rules from props
+  required,
+  min,
+  max,
+  minLength,
+  maxLength,
+  pattern,
+  validate,
+  valueAsNumber,
+  valueAsDate,
+  setValueAs,
+  shouldUnregister,
+  onChange,
+  onBlur,
+  disabled,
+  deps,
+  ...otherProps
 }: ConnectedSliderProps) {
-  // Apply default messages to user rules
-  const rulesWithDefaults = applyDefaultMessages(rules, label, required);
+  const rules = {
+    required,
+    min,
+    max,
+    minLength,
+    maxLength,
+    pattern,
+    validate,
+    valueAsNumber,
+    valueAsDate,
+    setValueAs,
+    shouldUnregister,
+    onChange,
+    onBlur,
+    disabled,
+    deps,
+  };
 
-  // Combine built-in validation with user-provided validation
-  const combinedRules = combineValidationRules(
-    rulesWithDefaults,
-    required ? { hasValue: commonValidations.hasValue(label) } : {},
-    rules
+  // Convert required to boolean for UI (it might be a validation rule object)
+  const isRequired = Boolean(required);
+
+  // Use validation approach that works with zodResolver at form level
+  const validationRules = createValidationRules(
+    isRequired ? { hasValue: commonValidations.hasValue(label) } : {},
+    rules,
+    label
   );
+
+  // Generate IDs based on custom id or fallback to name
+  const baseId = id || name;
+  const inputId = baseId;
+  const labelId = `${baseId}-label`;
+  const helperTextId = `${baseId}-helper-text`;
+  const errorTextId = `${baseId}-error-text`;
+
+  // Generate data-testids based on custom data-testid or fallback to name
+  const baseTestId = dataTestId || name;
+  const inputTestId = `${baseTestId}-input`;
+  const labelTestId = `${baseTestId}-label`;
+  const helperTextTestId = `${baseTestId}-helper-text`;
+  const errorTextTestId = `${baseTestId}-error-text`;
 
   return (
     <Controller
       name={name}
-      rules={combinedRules}
+      rules={validationRules}
       render={({ field, fieldState }) => {
         const hasError = !!fieldState.error;
 
         return (
-          <FormControl error={hasError} fullWidth>
+          <FormControl error={hasError}>
             {!hideLabel && (
-              <FormLabel required={required} id={`${name}-label`}>
+              <FormLabel
+                component="legend"
+                required={isRequired}
+                id={labelId}
+                data-testid={labelTestId}
+              >
                 {label}
               </FormLabel>
             )}
             <Slider
               {...field}
-              {...props}
-              value={field.value ?? (props.min || 0)}
-              onChange={(_, value) => field.onChange(value)}
-              aria-labelledby={hideLabel ? undefined : `${name}-label`}
+              {...otherProps}
+              id={inputId}
+              data-testid={inputTestId}
+              value={field.value || 0}
+              disabled={disabled}
+              onChange={(event, value) => field.onChange(value)}
+              aria-labelledby={!hideLabel ? labelId : undefined}
               aria-label={hideLabel ? label : undefined}
             />
             {(hasError || helperText) && (
-              <FormHelperText>
+              <FormHelperText
+                id={hasError ? errorTextId : helperTextId}
+                data-testid={hasError ? errorTextTestId : helperTextTestId}
+              >
                 {fieldState.error?.message || helperText}
               </FormHelperText>
             )}
