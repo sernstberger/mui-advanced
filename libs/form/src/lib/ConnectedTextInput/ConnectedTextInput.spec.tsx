@@ -1,13 +1,14 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormProvider, useForm } from 'react-hook-form';
+import { vi } from 'vitest';
 import { ConnectedTextInput } from './ConnectedTextInput';
 
 // Test wrapper component that provides FormProvider context
 function TestWrapper({
   children,
   defaultValues = {},
-  onSubmit = () => {},
+  onSubmit = vi.fn(),
 }: {
   children: React.ReactNode;
   defaultValues?: Record<string, any>;
@@ -23,8 +24,6 @@ function TestWrapper({
 }
 
 describe('ConnectedTextInput', () => {
-  const user = userEvent.setup();
-
   // Rendering Tests
   describe('Rendering', () => {
     it('should render with label', () => {
@@ -58,8 +57,8 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
-      expect(input.getAttribute('aria-label')).toBe('Hidden Label');
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-label', 'Hidden Label');
     });
 
     it('should render with helper text', () => {
@@ -84,10 +83,10 @@ describe('ConnectedTextInput', () => {
       );
 
       // MUI shows required indicator with asterisk
-      const labelElement = screen.getByText('Test Label') as HTMLElement;
+      const labelElement = screen.getByText('Test Label');
       expect(labelElement).toBeDefined();
-      const label = labelElement.closest('label') as HTMLLabelElement;
-      expect(label.className).toContain('Mui-required');
+      const label = labelElement.closest('label');
+      expect(label).toHaveClass('Mui-required');
     });
 
     it('should render with placeholder', () => {
@@ -119,7 +118,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should register with form control', async () => {
-      const mockSubmit = jest.fn();
+      const user = userEvent.setup();
+      const mockSubmit = vi.fn();
 
       render(
         <TestWrapper onSubmit={mockSubmit}>
@@ -142,7 +142,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should update form value on change', async () => {
-      const mockSubmit = jest.fn();
+      const user = userEvent.setup();
+      const mockSubmit = vi.fn();
 
       render(
         <TestWrapper onSubmit={mockSubmit}>
@@ -171,6 +172,8 @@ describe('ConnectedTextInput', () => {
   // Validation Tests
   describe('Validation', () => {
     it('should show required field error', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput
@@ -191,6 +194,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should show min/max length errors', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput
@@ -227,6 +232,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should show custom validation errors', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput
@@ -257,6 +264,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should prevent whitespace-only input', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput name="noWhitespace" label="No Whitespace Field" />
@@ -278,6 +287,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should clear errors on valid input', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput
@@ -316,7 +327,7 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('textbox');
       const labelId = input.getAttribute('aria-labelledby');
 
       expect(labelId).toBeTruthy();
@@ -333,8 +344,8 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
-      expect(input.getAttribute('aria-label')).toBe('Hidden Label');
+      const input = screen.getByRole('textbox');
+      expect(input).toHaveAttribute('aria-label', 'Hidden Label');
       expect(input.getAttribute('aria-labelledby')).toBeNull();
     });
 
@@ -349,7 +360,7 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('textbox');
       const describedBy = input.getAttribute('aria-describedby');
 
       expect(describedBy).toBeTruthy();
@@ -360,6 +371,8 @@ describe('ConnectedTextInput', () => {
     });
 
     it('should indicate validation state with aria-invalid', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput
@@ -371,21 +384,23 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByRole('textbox') as HTMLInputElement;
+      const input = screen.getByRole('textbox');
       const submitButton = screen.getByRole('button', { name: 'Submit' });
 
       // Initially valid
-      expect(input.getAttribute('aria-invalid')).toBe('false');
+      expect(input).toHaveAttribute('aria-invalid', 'false');
 
       // Trigger validation error
       await user.click(submitButton);
 
       await waitFor(() => {
-        expect(input.getAttribute('aria-invalid')).toBe('true');
+        expect(input).toHaveAttribute('aria-invalid', 'true');
       });
     });
 
     it('should be keyboard navigable', async () => {
+      const user = userEvent.setup();
+
       render(
         <TestWrapper>
           <ConnectedTextInput name="first" label="First Field" />
@@ -409,9 +424,7 @@ describe('ConnectedTextInput', () => {
   describe('Error Handling', () => {
     it('should handle missing FormProvider gracefully', () => {
       // This would typically cause an error in react-hook-form
-      const consoleSpy = jest
-        .spyOn(console, 'error')
-        .mockImplementation(() => {});
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
 
       expect(() => {
         render(<ConnectedTextInput name="orphan" label="Orphan Field" />);
