@@ -268,4 +268,32 @@ export const commonSchemas = {
       .number()
       .min(0, `${label} is required`)
       .or(z.array(z.number()).min(1, `${label} is required`)),
+
+  /**
+   * Required radio group selection
+   */
+  requiredRadio: (label: string) =>
+    z
+      .string()
+      .min(1, `${label} is required`)
+      .or(z.number().min(0, `${label} is required`)),
+
+  /**
+   * Required switch (must be true)
+   */
+  requiredSwitch: (label: string) =>
+    z.boolean().refine((val) => val === true, `${label} must be enabled`),
+
+  /**
+   * Required checkbox group (at least one selected)
+   */
+  requiredCheckboxGroup: (label: string) =>
+    z
+      .array(z.string())
+      .min(1, `At least one ${label.toLowerCase()} must be selected`)
+      .or(
+        z
+          .array(z.number())
+          .min(1, `At least one ${label.toLowerCase()} must be selected`)
+      ),
 };
