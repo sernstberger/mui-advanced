@@ -28,6 +28,24 @@ nx test form
 - [x] Support `required` visual indicator
 - [ ] Support input variants (standard, outlined, filled)
 
+### Testing & Identification Requirements
+- [ ] Support `data-testid` prop for input element identification in tests
+- [ ] Auto-generate data test IDs based on `name` prop when `data-testid` not provided
+  - Input: `data-testid="${name}-input"`
+  - Label: `data-testid="${name}-label"` 
+  - Helper text: `data-testid="${name}-helper-text"`
+  - Error text: `data-testid="${name}-error-text"`
+- [ ] Allow custom `data-testid` override for all elements
+- [ ] Support additional custom data attributes via `dataAttributes` prop
+- [ ] Support custom `id` prop for input element with fallback to `name` prop
+- [ ] Generate element IDs based on base ID (custom `id` or `name`):
+  - Input: `id="${id || name}"`
+  - Label: `id="${id || name}-label"`
+  - Helper text: `id="${id || name}-helper-text"`
+  - Error text: `id="${id || name}-error-text"`
+
+**Note**: MUI handles accessibility IDs automatically, but `data-testid` attributes for testing must be implemented manually. Custom `id` props should work alongside MUI's accessibility features without breaking aria relationships.
+
 ### Validation & Error Handling
 - [x] Display validation errors from react-hook-form
 - [ ] Support field-level validation rules
@@ -63,6 +81,8 @@ The following accessibility features are **automatically handled by MUI** and do
   - Inherits error state styling from FormControl
   - Changes color based on error state
 
+**Note**: MUI handles accessibility IDs automatically, but `data-testid` attributes for testing must be implemented manually.
+
 ### Manual Accessibility Implementation Required
 - [x] Use `aria-label` when visual label is hidden (`hideLabel={true}`)
 - [ ] Support `aria-autocomplete` for autocomplete inputs
@@ -92,6 +112,9 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
   helperText?: string;
   required?: boolean;
   zodSchema?: z.ZodSchema;
+  id?: string;
+  'data-testid'?: string;
+  dataAttributes?: Record<string, string>;
 }
 ```
 
@@ -107,6 +130,12 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
 - [x] **should render with placeholder**: Verify placeholder text appears
 - [x] **should render required indicator**: Verify required field indication
 - [ ] **should render with different variants**: Test standard, outlined, filled variants
+- [ ] **should have auto-generated data test IDs**: Verify input, label, helper text have correct data-testid based on name prop
+- [ ] **should use custom data-testid when provided**: Verify custom data-testid overrides auto-generated ones
+- [ ] **should apply custom data attributes**: Verify dataAttributes prop adds custom data-* attributes
+- [ ] **should use name as default ID**: Verify elements use name prop as base for IDs when no custom id provided
+- [ ] **should use custom ID when provided**: Verify custom id prop overrides name-based IDs
+- [ ] **should maintain MUI accessibility relationships**: Verify custom IDs don't break MUI's aria-labelledby/describedby relationships
 
 #### Form Integration Tests
 - [x] **should work inside FormProvider**: Verify component works with react-hook-form context
