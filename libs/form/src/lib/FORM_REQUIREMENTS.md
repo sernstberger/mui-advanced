@@ -12,11 +12,45 @@ nx test form
 ### Core Functionality
 - [x] Use react-hook-form Controller
 - [x] Use react-hook-form rules for validation (required, min, max, etc.)
-- [ ] Support custom zod validation functions
-- [ ] All inputs must be wrapped in a form with FormProvider
+- [x] Support custom zod validation functions (via zodResolver)
+- [x] All inputs must be wrapped in a form with FormProvider
 - [x] Prevent whitespace-only input (built into component - no user configuration needed)
-- [ ] Use zod for schema validation
-- [ ] Support controlled and uncontrolled components
+- [x] Use zod for schema validation (via zodResolver at form level)
+- [x] Support controlled and uncontrolled components
+
+### Zod Validation Implementation ✅
+The recommended approach for custom validation using zod:
+
+1. **Define zod schema at form level**:
+```typescript
+const schema = z.object({
+  email: z.string().email('Invalid email'),
+  name: z.string().min(2, 'Name too short'),
+});
+```
+
+2. **Use zodResolver with useForm**:
+```typescript
+const form = useForm<z.infer<typeof schema>>({
+  resolver: zodResolver(schema),
+  mode: 'onChange',
+});
+```
+
+3. **Individual components get validation automatically**:
+```typescript
+<ConnectedTextInput name="email" label="Email" />
+// Validation rules come from schema automatically
+```
+
+This approach provides:
+- ✅ Type safety across entire form
+- ✅ Centralized validation logic  
+- ✅ Better performance (single validation pass)
+- ✅ Consistent error handling
+- ✅ Works seamlessly with built-in validations
+
+**Note**: Field-level `zodSchema` prop was considered but the community standard is to use `zodResolver` at the form level for better performance and type safety.
 
 ### Input Configuration
 - [x] Required `name` prop for form field identification
@@ -110,11 +144,12 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
   hideLabel?: boolean;
   helperText?: string;
   required?: boolean;
-  zodSchema?: z.ZodSchema;
   id?: string;
   'data-testid'?: string;
 }
 ```
+
+**Note**: For zod validation, use `zodResolver` at the form level instead of individual field props. This provides better type safety and performance.
 
 ## Test Plan
 
@@ -144,7 +179,7 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
 - [x] **should show required field error**: Test required validation
 - [x] **should show min/max length errors**: Test length validation
 - [x] **should show custom validation errors**: Test custom rules
-- [ ] **should show zod validation errors**: Test zod schema validation
+- [x] **should show zod validation errors**: Test zod schema validation (via zodResolver)
 - [x] **should prevent whitespace-only input**: Test built-in trim validation (no explicit rules needed)
 - [x] **should clear errors on valid input**: Test error clearing
 - [ ] **should not submit form with validation errors**: Test form submission prevention
@@ -185,21 +220,22 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
 ### Storybook Stories
 
 #### Basic Usage
-- [ ] **Default**: Basic input with label
-- [ ] **Required**: Required field with indicator
-- [ ] **With Helper Text**: Input with guidance text
+- [x] **Default**: Basic input with label
+- [x] **Required**: Required field with indicator
+- [x] **With Helper Text**: Input with guidance text
 - [ ] **With Placeholder**: Input with placeholder text
 
 #### Accessibility Variants
-- [ ] **Hidden Label**: Input with aria-label instead of visible label
-- [ ] **Error State**: Input with validation error
+- [x] **Hidden Label**: Input with aria-label instead of visible label
+- [x] **Error State**: Input with validation error
 - [ ] **Disabled State**: Disabled input
 
 #### Validation Examples
-- [ ] **Required Validation**: Shows required field validation
-- [ ] **Length Validation**: Shows min/max length validation
-- [ ] **Custom Validation**: Shows custom zod validation
-- [ ] **Real-time Validation**: Shows validation as user types
+- [x] **Required Validation**: Shows required field validation
+- [x] **Length Validation**: Shows min/max length validation
+- [x] **Custom Validation**: Shows custom react-hook-form validation
+- [x] **Zod Validation**: Shows zod schema validation with zodResolver
+- [x] **Real-time Validation**: Shows validation as user types
 
 #### Visual Variants
 - [ ] **All MUI Variants**: Standard, outlined, filled

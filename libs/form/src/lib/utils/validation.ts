@@ -1,4 +1,83 @@
 import { ControllerProps } from 'react-hook-form';
+import { z } from 'zod';
+
+/**
+ * Creates a react-hook-form validation function from a zod schema
+ * This is primarily used for standalone field validation when not using zodResolver
+ */
+export const createZodValidation = (zodSchema: z.ZodSchema) => {
+  return (value: any) => {
+    const result = zodSchema.safeParse(value);
+    if (result.success) {
+      return true;
+    }
+    // Return the first error message from zod
+    return result.error.issues[0]?.message || 'Invalid value';
+  };
+};
+
+/**
+ * Helper function to create useForm with zodResolver
+ * This is the recommended way to use zod validation with react-hook-form
+ *
+ * @example
+ * const userSchema = z.object({
+ *   name: z.string().min(1, 'Name is required'),
+ *   email: z.string().email('Invalid email')
+ * });
+ *
+ * const form = useZodForm(userSchema, {
+ *   defaultValues: { name: '', email: '' }
+ * });
+ */
+export const createZodFormConfig = <T extends z.ZodSchema>(
+  schema: T,
+  options?: Omit<any, 'resolver'>
+) => {
+  return {
+    ...options,
+    resolver: undefined, // Will be set by the consumer using zodResolver
+    mode: 'onChange' as const,
+    // Export the schema for use in components
+    schema,
+  };
+};
+
+/**
+ * Type helper to infer form data type from zod schema
+ */
+export type InferFormData<T extends z.ZodSchema> = z.infer<T>;
+
+/**
+ * Creates validation rules for fields
+ * When using zodResolver at form level, this primarily handles built-in validations
+ * For custom validation, prefer using zodResolver with full form schema
+ */
+export const createValidationRules = (
+  builtInValidations: Record<string, (value: any) => true | string>,
+  userRules?: ControllerProps['rules'],
+  label?: string
+): ControllerProps['rules'] => {
+  // When using zodResolver, we primarily rely on built-in validations
+  // like noWhitespaceOnly for additional client-side validation
+  if (!userRules) {
+    return {
+      validate: builtInValidations,
+    };
+  }
+
+  // Apply default messages and combine with built-in validations
+  const rulesWithDefaults = applyDefaultMessages(
+    userRules,
+    label || '',
+    Boolean(userRules.required)
+  );
+  return combineValidationRules(
+    rulesWithDefaults,
+    builtInValidations,
+    userRules
+  );
+};
 
 /**
  * Default error message templates

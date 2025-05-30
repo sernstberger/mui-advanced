@@ -6,10 +6,12 @@ import {
   InputLabel,
   InputProps,
 } from '@mui/material';
+import { z } from 'zod';
 import {
   applyDefaultMessages,
   combineValidationRules,
   commonValidations,
+  createValidationRules,
 } from '../utils/validation';
 
 export type ConnectedTextInputProps = Omit<
@@ -79,14 +81,11 @@ export function ConnectedTextInput({
   // Convert required to boolean for UI (it might be a validation rule object)
   const isRequired = Boolean(required);
 
-  // Apply default messages to user rules
-  const rulesWithDefaults = applyDefaultMessages(rules, label, isRequired);
-
-  // Combine built-in validation with user-provided validation
-  const combinedRules = combineValidationRules(
-    rulesWithDefaults,
+  // Use validation approach that works with zodResolver at form level
+  const validationRules = createValidationRules(
     { noWhitespaceOnly: commonValidations.noWhitespaceOnly },
-    rules
+    rules,
+    label
   );
 
   // Generate IDs based on custom id or fallback to name
@@ -106,7 +105,7 @@ export function ConnectedTextInput({
   return (
     <Controller
       name={name}
-      rules={combinedRules}
+      rules={validationRules}
       render={({ field, fieldState }) => {
         const hasError = !!fieldState.error;
 
