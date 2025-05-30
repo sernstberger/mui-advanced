@@ -49,170 +49,123 @@ export const createZodFormConfig = <T extends z.ZodSchema>(
 export type InferFormData<T extends z.ZodSchema> = z.infer<T>;
 
 /**
- * Default error message templates
+ * Creates a default error message for react-hook-form validation rules
  */
-const getDefaultErrorMessages = (label: string) => {
-  return {
-    required: `${label} is required`,
-    minLength: `${label} must be at least {value} characters`,
-    maxLength: `${label} must be no more than {value} characters`,
-    min: `${label} must be at least {value}`,
-    max: `${label} must be no more than {value}`,
-    pattern: `${label} format is invalid`,
-  };
+const createDefaultMessage = (
+  label: string,
+  rule: string,
+  value?: any
+): string => {
+  switch (rule) {
+    case 'required':
+      return `${label} is required`;
+    case 'min':
+      return `${label} must be at least ${value}`;
+    case 'max':
+      return `${label} must be no more than ${value}`;
+    case 'minLength':
+      return label && label !== 'Field'
+        ? `${label} must be at least ${value} characters`
+        : `Must be at least ${value} characters`;
+    case 'maxLength':
+      return label && label !== 'Field'
+        ? `${label} must be no more than ${value} characters`
+        : `Must be no more than ${value} characters`;
+    default:
+      return `${label} is invalid`;
+  }
 };
 
 /**
- * Creates validation rules for fields using our new zod-first approach
- * This handles both built-in validations and custom zod schema validation
- * Also provides default error messages for basic validation rules
+ * Enhanced validation rules creator that supports both react-hook-form and zod validations
+ * Handles built-in validations from components and merges with custom user rules
  */
 export const createValidationRules = (
   builtInValidations: Record<string, (value: any) => true | string>,
   userRules?: ControllerProps['rules'],
   label?: string
 ): ControllerProps['rules'] => {
-  if (!userRules) {
-    return {
-      validate: builtInValidations,
-    };
+  if (!userRules && Object.keys(builtInValidations).length === 0) {
+    return {};
   }
 
-  // Get default error messages for this field
-  const defaults = label ? getDefaultErrorMessages(label) : null;
+  const rules: Record<string, any> = {};
 
-  // Create enhanced rules with default messages
-  const enhancedRules: ControllerProps['rules'] = {};
+  // Handle user rules first
+  if (userRules) {
+    // Process validation rules that might need default messages
+    Object.entries(userRules).forEach(([key, value]) => {
+      if (key === 'validate') {
+        // Handle validate functions separately
+        return;
+      }
 
-  // Handle required rule
-  if (userRules.required !== undefined) {
-    if (typeof userRules.required === 'boolean') {
-      enhancedRules.required =
-        userRules.required && defaults ? defaults.required : userRules.required;
-    } else {
-      enhancedRules.required = userRules.required; // Custom message or object provided
-    }
+      // Convert simple validation rules to objects with messages
+      if (
+        key === 'required' ||
+        key === 'minLength' ||
+        key === 'maxLength' ||
+        key === 'min' ||
+        key === 'max'
+      ) {
+        if (
+          typeof value === 'boolean' &&
+          value === true &&
+          key === 'required'
+        ) {
+          // Convert required: true to required: "Label is required" only if label is provided
+          rules[key] = label ? createDefaultMessage(label, key) : true;
+        } else if (typeof value === 'number' && key !== 'required') {
+          // Convert numeric rules like minLength: 5 to { value: 5, message: "..." }
+          rules[key] = {
+            value,
+            message: createDefaultMessage(label || 'Field', key, value),
+          };
+        } else {
+          // Keep custom messages and complex rules as-is
+          rules[key] = value;
+        }
+      } else {
+        // Pass through other rules unchanged
+        rules[key] = value;
+      }
+    });
   }
-
-  // Handle minLength rule
-  if (userRules.minLength !== undefined) {
-    if (typeof userRules.minLength === 'number') {
-      enhancedRules.minLength = {
-        value: userRules.minLength,
-        message:
-          defaults?.minLength?.replace(
-            '{value}',
-            userRules.minLength.toString()
-          ) || `Must be at least ${userRules.minLength} characters`,
-      };
-    } else {
-      enhancedRules.minLength = userRules.minLength; // Custom message provided
-    }
-  }
-
-  // Handle maxLength rule
-  if (userRules.maxLength !== undefined) {
-    if (typeof userRules.maxLength === 'number') {
-      enhancedRules.maxLength = {
-        value: userRules.maxLength,
-        message:
-          defaults?.maxLength?.replace(
-            '{value}',
-            userRules.maxLength.toString()
-          ) || `Must be no more than ${userRules.maxLength} characters`,
-      };
-    } else {
-      enhancedRules.maxLength = userRules.maxLength; // Custom message provided
-    }
-  }
-
-  // Handle min rule
-  if (userRules.min !== undefined) {
-    if (typeof userRules.min === 'number') {
-      enhancedRules.min = {
-        value: userRules.min,
-        message:
-          defaults?.min?.replace('{value}', userRules.min.toString()) ||
-          `Must be at least ${userRules.min}`,
-      };
-    } else {
-      enhancedRules.min = userRules.min; // Custom message provided
-    }
-  }
-
-  // Handle max rule
-  if (userRules.max !== undefined) {
-    if (typeof userRules.max === 'number') {
-      enhancedRules.max = {
-        value: userRules.max,
-        message:
-          defaults?.max?.replace('{value}', userRules.max.toString()) ||
-          `Must be no more than ${userRules.max}`,
-      };
-    } else {
-      enhancedRules.max = userRules.max; // Custom message provided
-    }
-  }
-
-  // Handle pattern rule
-  if (userRules.pattern !== undefined) {
-    if (userRules.pattern instanceof RegExp) {
-      enhancedRules.pattern = {
-        value: userRules.pattern,
-        message: defaults?.pattern || 'Format is invalid',
-      };
-    } else {
-      enhancedRules.pattern = userRules.pattern; // Custom message provided
-    }
-  }
-
-  // Copy other rules as-is
-  Object.keys(userRules).forEach((key) => {
-    if (
-      ![
-        'required',
-        'minLength',
-        'maxLength',
-        'min',
-        'max',
-        'pattern',
-        'validate',
-      ].includes(key)
-    ) {
-      (enhancedRules as any)[key] = (userRules as any)[key];
-    }
-  });
 
   // Handle validate functions - merge built-in validations with user validations
-  if (userRules.validate) {
+  if (userRules?.validate) {
     if (typeof userRules.validate === 'function') {
-      enhancedRules.validate = {
+      rules.validate = {
         ...builtInValidations,
         custom: userRules.validate,
       };
     } else if (typeof userRules.validate === 'object') {
-      enhancedRules.validate = {
+      rules.validate = {
         ...builtInValidations,
         ...userRules.validate,
       };
     }
   } else {
-    enhancedRules.validate = builtInValidations;
+    // Always set validate, even if empty
+    rules.validate = builtInValidations;
   }
 
-  return enhancedRules;
+  return rules as ControllerProps['rules'];
 };
 
 /**
  * Common zod schemas for different field types
- * These provide a zod-first approach to validation and replace the need for most custom validation functions
+ * These provide a zod-first approach to validation using Zod v3 syntax
  */
 export const commonSchemas = {
   /**
    * Required text field that doesn't allow whitespace-only input
    */
   requiredText: (label: string) =>
-    z.string().min(1, `${label} is required`).trim(),
+    z
+      .string()
+      .min(1, `${label} is required`)
+      .transform((s) => s.trim()),
 
   /**
    * Optional text field that doesn't allow whitespace-only input if provided
@@ -296,4 +249,38 @@ export const commonSchemas = {
           .array(z.number())
           .min(1, `At least one ${label.toLowerCase()} must be selected`)
       ),
+};
+
+/**
+ * Common validation functions for react-hook-form
+ * These are simple validation functions that return true for valid values or error messages for invalid ones
+ */
+export const commonValidations = {
+  notEmpty: (label: string) => (value: any) => {
+    if (!value || value === '') {
+      return `${label} is required`;
+    }
+    return true;
+  },
+
+  atLeastOneSelected: (label: string) => (value: any) => {
+    if (!value || !Array.isArray(value) || value.length === 0) {
+      return `At least one ${label.toLowerCase()} must be selected`;
+    }
+    return true;
+  },
+
+  mustBeEnabled: (label: string) => (value: any) => {
+    if (value !== true) {
+      return `${label} must be enabled`;
+    }
+    return true;
+  },
+
+  hasRating: (label: string) => (value: any) => {
+    if (!value || value === 0) {
+      return `${label} is required`;
+    }
+    return true;
+  },
 };
