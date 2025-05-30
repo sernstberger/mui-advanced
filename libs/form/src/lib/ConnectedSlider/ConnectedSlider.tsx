@@ -6,7 +6,11 @@ import {
   Slider,
   SliderProps,
 } from '@mui/material';
-import { createValidationRules, commonValidations } from '../utils/validation';
+import {
+  createValidationRules,
+  createZodValidation,
+  commonSchemas,
+} from '../utils/validation';
 
 export type ConnectedSliderProps = Omit<
   SliderProps,
@@ -77,7 +81,9 @@ export function ConnectedSlider({
 
   // Use validation approach that works with zodResolver at form level
   const validationRules = createValidationRules(
-    isRequired ? { hasValue: commonValidations.hasValue(label) } : {},
+    isRequired
+      ? { hasValue: createZodValidation(commonSchemas.requiredSlider(label)) }
+      : {},
     rules,
     label
   );

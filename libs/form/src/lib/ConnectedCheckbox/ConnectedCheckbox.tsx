@@ -6,7 +6,11 @@ import {
   FormControlLabel,
   FormHelperText,
 } from '@mui/material';
-import { createValidationRules, commonValidations } from '../utils/validation';
+import {
+  createValidationRules,
+  createZodValidation,
+  commonSchemas,
+} from '../utils/validation';
 
 export type ConnectedCheckboxProps = Omit<
   CheckboxProps,
@@ -75,7 +79,13 @@ export function ConnectedCheckbox({
 
   // Use validation approach that works with zodResolver at form level
   const validationRules = createValidationRules(
-    isRequired ? { mustBeChecked: commonValidations.mustBeChecked(label) } : {},
+    isRequired
+      ? {
+          mustBeChecked: createZodValidation(
+            commonSchemas.requiredCheckbox(label)
+          ),
+        }
+      : {},
     rules,
     label
   );

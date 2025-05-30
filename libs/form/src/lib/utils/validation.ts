@@ -204,148 +204,68 @@ export const createValidationRules = (
 };
 
 /**
- * Common built-in validations for different field types
+ * Common zod schemas for different field types
+ * These provide a zod-first approach to validation and replace the need for most custom validation functions
  */
-export const commonValidations = {
+export const commonSchemas = {
   /**
-   * Validation for text inputs to prevent whitespace-only input
+   * Required text field that doesn't allow whitespace-only input
    */
-  noWhitespaceOnly: (value: string) => {
-    if (value && !value.trim()) {
-      return 'Cannot be empty or whitespace only';
-    }
-    return true;
-  },
+  requiredText: (label: string) =>
+    z.string().min(1, `${label} is required`).trim(),
 
   /**
-   * Validation for required checkboxes
+   * Optional text field that doesn't allow whitespace-only input if provided
    */
-  mustBeChecked: (label: string) => (value: boolean) => {
-    if (!value) {
-      return `${label} must be checked`;
-    }
-    return true;
-  },
+  optionalText: () =>
+    z
+      .string()
+      .refine(
+        (value) => !value || value.trim().length > 0,
+        'Cannot be empty or whitespace only'
+      )
+      .optional()
+      .or(z.literal('')),
 
   /**
-   * Validation for required switches
+   * Required checkbox (must be true)
    */
-  mustBeEnabled: (label: string) => (value: boolean) => {
-    if (!value) {
-      return `${label} must be enabled`;
-    }
-    return true;
-  },
+  requiredCheckbox: (label: string) =>
+    z.boolean().refine((val) => val === true, `${label} must be checked`),
 
   /**
-   * Validation for required select/autocomplete/radio fields
+   * Required select/autocomplete field
    */
-  notEmpty: (label: string) => (value: string | number) => {
-    if (value === '' || value === null || value === undefined) {
-      return `${label} is required`;
-    }
-    return true;
-  },
+  requiredSelect: (label: string) =>
+    z
+      .string()
+      .min(1, `${label} is required`)
+      .or(z.number().min(0, `${label} is required`)),
 
   /**
-   * Validation for required autocomplete with multiple selection
+   * Required multi-select field
    */
-  notEmptyMultiple: (label: string) => (value: any[] | null) => {
-    if (!value || (Array.isArray(value) && value.length === 0)) {
-      return `${label} is required`;
-    }
-    return true;
-  },
+  requiredMultiSelect: (label: string) =>
+    z
+      .array(z.string())
+      .min(1, `At least one ${label.toLowerCase()} must be selected`)
+      .or(
+        z
+          .array(z.number())
+          .min(1, `At least one ${label.toLowerCase()} must be selected`)
+      ),
 
   /**
-   * Validation for required rating
+   * Required rating (must be greater than 0)
    */
-  hasRating: (label: string) => (value: number | null) => {
-    if (value === null || value === 0) {
-      return `${label} is required`;
-    }
-    return true;
-  },
+  requiredRating: (label: string) => z.number().min(1, `${label} is required`),
 
   /**
-   * Validation for required checkbox groups
+   * Required slider value
    */
-  atLeastOneSelected: (label: string) => (value: (string | number)[]) => {
-    if (!value || value.length === 0) {
-      return `At least one ${label.toLowerCase()} must be selected`;
-    }
-    return true;
-  },
-
-  /**
-   * Validation for required slider (custom logic based on needs)
-   */
-  hasValue: (label: string) => (value: number | number[]) => {
-    // This is a placeholder - slider validation logic may vary based on requirements
-    if (value === null || value === undefined) {
-      return `${label} is required`;
-    }
-    return true;
-  },
-};
-
-// Temporary deprecated functions - will be removed once all components are updated
-/**
- * @deprecated Use createValidationRules instead
- */
-export const applyDefaultMessages = (
-  userRules: ControllerProps['rules'],
-  label: string,
-  required?: boolean
-): ControllerProps['rules'] => {
-  const defaults = getDefaultErrorMessages(label);
-  const enhancedRules: ControllerProps['rules'] = {};
-
-  // Handle required rule
-  if (userRules?.required !== undefined) {
-    if (typeof userRules.required === 'boolean') {
-      enhancedRules.required = userRules.required ? defaults.required : false;
-    } else if (typeof userRules.required === 'string') {
-      enhancedRules.required = userRules.required; // Custom message provided
-    } else {
-      enhancedRules.required = userRules.required; // Object with value/message
-    }
-  } else if (required) {
-    // If required prop is true but no required rule, add default
-    enhancedRules.required = defaults.required;
-  }
-
-  // Copy other rules as-is
-  if (userRules) {
-    Object.keys(userRules).forEach((key) => {
-      if (!['required'].includes(key)) {
-        (enhancedRules as any)[key] = (userRules as any)[key];
-      }
-    });
-  }
-
-  return enhancedRules;
-};
-
-/**
- * @deprecated Use createValidationRules instead
- */
-export const combineValidationRules = (
-  rulesWithDefaults: ControllerProps['rules'],
-  builtInValidations: Record<string, (value: any) => true | string>,
-  userRules?: ControllerProps['rules']
-): ControllerProps['rules'] => {
-  return {
-    ...rulesWithDefaults,
-    validate: {
-      // Built-in validations
-      ...builtInValidations,
-      // User-provided validation (if any)
-      ...(typeof userRules?.validate === 'function'
-        ? { custom: userRules.validate }
-        : typeof userRules?.validate === 'object'
-        ? userRules.validate
-        : {}),
-    },
-  };
+  requiredSlider: (label: string) =>
+    z
+      .number()
+      .min(0, `${label} is required`)
+      .or(z.array(z.number()).min(1, `${label} is required`)),
 };

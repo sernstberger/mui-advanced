@@ -7,7 +7,11 @@ import {
   Select,
   SelectProps,
 } from '@mui/material';
-import { createValidationRules, commonValidations } from '../utils/validation';
+import {
+  createValidationRules,
+  createZodValidation,
+  commonSchemas,
+} from '../utils/validation';
 
 export interface SelectOption {
   value: string | number;
@@ -88,7 +92,9 @@ export function ConnectedSelect({
 
   // Use validation approach that works with zodResolver at form level
   const validationRules = createValidationRules(
-    isRequired ? { notEmpty: commonValidations.notEmpty(label) } : {},
+    isRequired
+      ? { notEmpty: createZodValidation(commonSchemas.requiredSelect(label)) }
+      : {},
     rules,
     label
   );

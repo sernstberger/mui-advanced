@@ -6,7 +6,11 @@ import {
   TextField,
   FormHelperText,
 } from '@mui/material';
-import { createValidationRules, commonValidations } from '../utils/validation';
+import {
+  createValidationRules,
+  createZodValidation,
+  commonSchemas,
+} from '../utils/validation';
 
 export interface AutocompleteOption {
   label: string;
@@ -94,8 +98,12 @@ export function ConnectedAutocomplete({
     // Add built-in validations when we have a required field, regardless of whether it's a string or boolean
     isRequired
       ? multiple
-        ? { notEmptyMultiple: commonValidations.notEmptyMultiple(label) }
-        : { notEmpty: commonValidations.notEmpty(label) }
+        ? {
+            notEmptyMultiple: createZodValidation(
+              commonSchemas.requiredMultiSelect(label)
+            ),
+          }
+        : { notEmpty: createZodValidation(commonSchemas.requiredSelect(label)) }
       : {},
     rules,
     label

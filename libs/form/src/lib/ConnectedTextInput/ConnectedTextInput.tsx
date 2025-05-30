@@ -7,7 +7,11 @@ import {
   InputProps,
 } from '@mui/material';
 import { z } from 'zod';
-import { createValidationRules, commonValidations } from '../utils/validation';
+import {
+  createValidationRules,
+  createZodValidation,
+  commonSchemas,
+} from '../utils/validation';
 
 export type ConnectedTextInputProps = Omit<
   InputProps,
@@ -78,7 +82,7 @@ export function ConnectedTextInput({
 
   // Use validation approach that works with zodResolver at form level
   const validationRules = createValidationRules(
-    { noWhitespaceOnly: commonValidations.noWhitespaceOnly },
+    { noWhitespaceOnly: createZodValidation(commonSchemas.optionalText()) },
     rules,
     label
   );
