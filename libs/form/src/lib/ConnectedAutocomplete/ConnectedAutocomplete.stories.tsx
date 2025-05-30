@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ConnectedAutocomplete } from './ConnectedAutocomplete';
-import { FormProvider, useForm } from 'react-hook-form';
 import { action } from '@storybook/addon-actions';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 const options = [
   { value: 'option1', label: 'Option 1' },
@@ -11,28 +11,26 @@ const options = [
   { value: 'option5', label: 'Option 5' },
 ];
 
-function StoryWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={methods.handleSubmit(action('form-submit'))}>
-        {children}
-        <button type="submit" style={{ marginTop: '1rem' }}>
-          Submit
-        </button>
-      </form>
-    </FormProvider>
-  );
-}
-
 const meta: Meta<typeof ConnectedAutocomplete> = {
   title: 'Form/ConnectedAutocomplete',
   component: ConnectedAutocomplete,
   decorators: [
     (Story) => (
-      <StoryWrapper>
-        <Story />
-      </StoryWrapper>
+      <ConnectedForm onSubmit={action('form-submit')}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            maxWidth: '400px',
+          }}
+        >
+          <Story />
+          <button type="submit" style={{ marginTop: '1rem' }}>
+            Submit
+          </button>
+        </div>
+      </ConnectedForm>
     ),
   ],
   parameters: {

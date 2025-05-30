@@ -2,51 +2,32 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ConnectedSelect } from './ConnectedSelect';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
-import { FormProvider, useForm } from 'react-hook-form';
 import { Button } from '@mui/material';
-
-// Wrapper component to provide FormProvider context
-function FormWrapper({
-  children,
-  defaultValues = {},
-}: {
-  children: React.ReactNode;
-  defaultValues?: Record<string, any>;
-}) {
-  const methods = useForm({ defaultValues });
-
-  const onSubmit = (data: any) => {
-    console.log('Form submitted:', data);
-  };
-
-  return (
-    <FormProvider {...methods}>
-      <form
-        onSubmit={methods.handleSubmit(onSubmit)}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          maxWidth: '400px',
-        }}
-      >
-        {children}
-        <Button type="submit" variant="contained">
-          Submit
-        </Button>
-      </form>
-    </FormProvider>
-  );
-}
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 const meta: Meta<typeof ConnectedSelect> = {
   component: ConnectedSelect,
   title: 'ConnectedSelect',
   decorators: [
     (Story, { args }) => (
-      <FormWrapper defaultValues={{ [args.name || 'defaultField']: '' }}>
-        <Story />
-      </FormWrapper>
+      <ConnectedForm
+        formProps={{ defaultValues: { [args.name || 'defaultField']: '' } }}
+        onSubmit={(data) => console.log('Form submitted:', data)}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            maxWidth: '400px',
+          }}
+        >
+          <Story />
+          <Button type="submit" variant="contained">
+            Submit
+          </Button>
+        </div>
+      </ConnectedForm>
     ),
   ],
 };

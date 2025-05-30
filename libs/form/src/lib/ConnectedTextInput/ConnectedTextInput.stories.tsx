@@ -2,10 +2,9 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { ConnectedTextInput } from './ConnectedTextInput';
 import { within } from '@storybook/testing-library';
 import { expect } from '@storybook/jest';
-import { FormProvider, useForm } from 'react-hook-form';
 import { Button } from '@mui/material';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 // Example zod schema for form validation
 const exampleSchema = z.object({
@@ -16,58 +15,6 @@ const exampleSchema = z.object({
 });
 
 type FormData = z.infer<typeof exampleSchema>;
-
-// Wrapper component to provide FormProvider context
-function FormWrapper({
-  children,
-  defaultValues = {},
-  onSubmit,
-}: {
-  children: React.ReactNode;
-  defaultValues?: Record<string, any>;
-  onSubmit?: (data: FormData) => void;
-}) {
-  const form = useForm<FormData>({
-    resolver: zodResolver(exampleSchema),
-    defaultValues,
-    mode: 'onChange',
-  });
-
-  const handleSubmit = (data: FormData) => {
-    console.log('Form submitted:', data);
-    onSubmit?.(data);
-  };
-
-  return (
-    <FormProvider {...form}>
-      <form
-        onSubmit={form.handleSubmit(handleSubmit)}
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          maxWidth: '400px',
-        }}
-      >
-        {children}
-        <Button
-          type="submit"
-          variant="contained"
-          disabled={form.formState.isSubmitting}
-        >
-          Submit
-        </Button>
-        <div className="text-sm text-gray-600">
-          <p>Form Valid: {form.formState.isValid ? 'Yes' : 'No'}</p>
-          <p>
-            Has Errors:{' '}
-            {Object.keys(form.formState.errors).length > 0 ? 'Yes' : 'No'}
-          </p>
-        </div>
-      </form>
-    </FormProvider>
-  );
-}
 
 const meta: Meta<typeof ConnectedTextInput> = {
   component: ConnectedTextInput,
@@ -144,37 +91,53 @@ export const PlaygroundTest: Story = {
 
 export const WithZodValidation: Story = {
   render: () => (
-    <FormWrapper>
-      <ConnectedTextInput
-        name="email"
-        label="Email"
-        required
-        placeholder="Enter your email"
-      />
-      <ConnectedTextInput
-        name="name"
-        label="Name"
-        required
-        placeholder="Enter your name"
-      />
-      <ConnectedTextInput
-        name="website"
-        label="Website"
-        placeholder="https://example.com"
-        helperText="Optional: Enter your website URL"
-      />
-    </FormWrapper>
+    <ConnectedForm<FormData>
+      schema={exampleSchema}
+      onSubmit={(data) => console.log('Form submitted:', data)}
+      formProps={{ mode: 'onChange' }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '16px',
+          maxWidth: '400px',
+        }}
+      >
+        <ConnectedTextInput
+          name="email"
+          label="Email"
+          required
+          placeholder="Enter your email"
+        />
+        <ConnectedTextInput
+          name="name"
+          label="Name"
+          required
+          placeholder="Enter your name"
+        />
+        <ConnectedTextInput
+          name="website"
+          label="Website"
+          placeholder="https://example.com"
+          helperText="Optional: Enter your website URL"
+        />
+        <Button type="submit" variant="contained">
+          Submit
+        </Button>
+      </div>
+    </ConnectedForm>
   ),
   parameters: {
     docs: {
       description: {
         story: `
-This example demonstrates the **recommended way** to use zod validation with ConnectedTextInput:
+This example demonstrates the **simplified way** to use zod validation with ConnectedForm:
 
 1. **Define a zod schema** at the form level
-2. **Use zodResolver** with useForm hook
-3. **Wrap form in FormProvider** to provide context
-4. **Individual fields** get validation automatically from the schema
+2. **Pass schema to ConnectedForm** - no need for manual zodResolver setup
+3. **Individual fields** get validation automatically from the schema
+4. **Built-in form handling** with submit and error handling
 
 The validation happens automatically based on the schema:
 - Email field validates email format
@@ -187,6 +150,7 @@ This approach provides:
 - ✅ Centralized validation logic
 - ✅ Better performance (single validation pass)
 - ✅ Consistent error handling
+- ✅ Simplified setup with ConnectedForm
         `,
       },
     },
@@ -195,20 +159,20 @@ This approach provides:
 
 export const BasicUsage: Story = {
   render: () => (
-    <FormWrapper>
+    <ConnectedForm>
       <ConnectedTextInput
         name="email"
         label="Email"
         required
         placeholder="Enter your email"
       />
-    </FormWrapper>
+    </ConnectedForm>
   ),
 };
 
 export const WithHelperText: Story = {
   render: () => (
-    <FormWrapper>
+    <ConnectedForm>
       <ConnectedTextInput
         name="name"
         label="Full Name"
@@ -216,13 +180,13 @@ export const WithHelperText: Story = {
         placeholder="John Doe"
         helperText="Enter your first and last name"
       />
-    </FormWrapper>
+    </ConnectedForm>
   ),
 };
 
 export const HiddenLabelWithZod: Story = {
   render: () => (
-    <FormWrapper>
+    <ConnectedForm>
       <ConnectedTextInput
         name="email"
         label="Email Address"
@@ -230,6 +194,6 @@ export const HiddenLabelWithZod: Story = {
         required
         placeholder="Email Address"
       />
-    </FormWrapper>
+    </ConnectedForm>
   ),
 };

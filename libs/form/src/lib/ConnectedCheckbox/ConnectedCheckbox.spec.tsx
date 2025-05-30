@@ -1,14 +1,9 @@
 import { render, screen } from '@testing-library/react';
-import { FormProvider, useForm } from 'react-hook-form';
 import { ConnectedCheckbox } from './ConnectedCheckbox';
+import { ConnectedForm } from '../ConnectedForm/ConnectedForm';
 
 function TestWrapper({ children }: { children: React.ReactNode }) {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <form>{children}</form>
-    </FormProvider>
-  );
+  return <ConnectedForm>{children}</ConnectedForm>;
 }
 
 describe('ConnectedCheckbox', () => {
@@ -46,6 +41,6 @@ describe('ConnectedCheckbox', () => {
 
     const checkbox = screen.getByRole('checkbox');
     expect(checkbox).toBeDefined();
-    expect(checkbox.hasAttribute('disabled')).toBe(true);
+    expect(checkbox).toBeDisabled();
   });
 });
