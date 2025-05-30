@@ -187,8 +187,7 @@ describe('ConnectedSelect', () => {
             name="required"
             label="Required Select"
             options={testOptions}
-            required
-            rules={{ required: 'This field is required' }}
+            required="This field is required"
           />
           <button type="submit">Submit</button>
         </TestWrapper>

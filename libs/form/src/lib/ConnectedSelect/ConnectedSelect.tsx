@@ -1,4 +1,4 @@
-import { Controller, ControllerProps } from 'react-hook-form';
+import { Controller, ControllerProps, RegisterOptions } from 'react-hook-form';
 import {
   FormControl,
   FormHelperText,
@@ -19,36 +19,80 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
-export interface ConnectedSelectProps
-  extends Omit<SelectProps, 'name' | 'defaultValue'> {
-  name: string;
-  label: string;
-  hideLabel?: boolean;
-  helperText?: string;
-  required?: boolean;
-  rules?: ControllerProps['rules'];
-  options: SelectOption[];
-  placeholder?: string;
-}
+export type ConnectedSelectProps = Omit<
+  SelectProps,
+  | 'name'
+  | 'defaultValue'
+  | 'required'
+  | 'min'
+  | 'max'
+  | 'pattern'
+  | 'validate'
+  | 'minLength'
+  | 'maxLength'
+> &
+  RegisterOptions & {
+    name: string;
+    label: string;
+    hideLabel?: boolean;
+    helperText?: string;
+    options: SelectOption[];
+    placeholder?: string;
+  };
 
 export function ConnectedSelect({
   name,
   label,
   hideLabel = false,
   helperText,
-  required = false,
-  rules,
   options,
   placeholder,
-  ...props
+  // Extract react-hook-form rules from props
+  required,
+  min,
+  max,
+  minLength,
+  maxLength,
+  pattern,
+  validate,
+  valueAsNumber,
+  valueAsDate,
+  setValueAs,
+  shouldUnregister,
+  onChange,
+  onBlur,
+  disabled,
+  deps,
+  ...otherProps
 }: ConnectedSelectProps) {
+  const rules = {
+    required,
+    min,
+    max,
+    minLength,
+    maxLength,
+    pattern,
+    validate,
+    valueAsNumber,
+    valueAsDate,
+    setValueAs,
+    shouldUnregister,
+    onChange,
+    onBlur,
+    disabled,
+    deps,
+  };
+
+  // Convert required to boolean for UI (it might be a validation rule object)
+  const isRequired = Boolean(required);
+
   // Apply default messages to user rules
-  const rulesWithDefaults = applyDefaultMessages(rules, label, required);
+  const rulesWithDefaults = applyDefaultMessages(rules, label, isRequired);
 
   // Combine built-in validation with user-provided validation
   const combinedRules = combineValidationRules(
     rulesWithDefaults,
-    required ? { notEmpty: commonValidations.notEmpty(label) } : {},
+    isRequired ? { notEmpty: commonValidations.notEmpty(label) } : {},
     rules
   );
 
@@ -60,12 +104,18 @@ export function ConnectedSelect({
         const hasError = !!fieldState.error;
 
         return (
-          <FormControl error={hasError} required={required}>
-            {!hideLabel && <InputLabel>{label}</InputLabel>}
+          <FormControl error={hasError}>
+            {!hideLabel && (
+              <InputLabel id={`${name}-label`} required={isRequired}>
+                {label}
+              </InputLabel>
+            )}
             <Select
               {...field}
-              {...props}
+              {...otherProps}
+              labelId={`${name}-label`}
               id={name}
+              label={!hideLabel ? label : undefined}
               displayEmpty={!!placeholder}
               aria-label={hideLabel ? label : undefined}
             >
