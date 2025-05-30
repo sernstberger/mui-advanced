@@ -1,32 +1,31 @@
 import { Controller, ControllerProps } from 'react-hook-form';
 import {
+  Checkbox,
   FormControl,
+  FormControlLabel,
+  FormGroup,
   FormHelperText,
-  InputLabel,
-  Select,
-  SelectProps,
-  MenuItem,
+  FormLabel,
 } from '@mui/material';
 
-export interface SelectOption {
+export interface CheckboxGroupOption {
   value: string | number;
   label: string;
   disabled?: boolean;
 }
 
-export interface ConnectedSelectProps
-  extends Omit<SelectProps, 'name' | 'defaultValue'> {
+export interface ConnectedCheckboxGroupProps {
   name: string;
   label: string;
   hideLabel?: boolean;
   helperText?: string;
   required?: boolean;
   rules?: ControllerProps['rules'];
-  options: SelectOption[];
-  placeholder?: string;
+  options: CheckboxGroupOption[];
+  row?: boolean;
 }
 
-export function ConnectedSelect({
+export function ConnectedCheckboxGroup({
   name,
   label,
   hideLabel = false,
@@ -34,13 +33,12 @@ export function ConnectedSelect({
   required = false,
   rules,
   options,
-  placeholder,
-  ...props
-}: ConnectedSelectProps) {
-  // Built-in validation to prevent empty selection when required
-  const builtInValidation = (value: string | number) => {
-    if (required && (value === '' || value === null || value === undefined)) {
-      return `${label} is required`;
+  row = false,
+}: ConnectedCheckboxGroupProps) {
+  // Built-in validation to require at least one checkbox when required
+  const builtInValidation = (value: (string | number)[]) => {
+    if (required && (!value || value.length === 0)) {
+      return `At least one ${label.toLowerCase()} must be selected`;
     }
     return true;
   };
@@ -48,7 +46,7 @@ export function ConnectedSelect({
   // Create default error messages using the field label
   const getDefaultErrorMessages = () => {
     return {
-      required: `${label} is required`,
+      required: `At least one ${label.toLowerCase()} must be selected`,
       minLength: `${label} must be at least {value} characters`,
       maxLength: `${label} must be no more than {value} characters`,
       min: `${label} must be at least {value}`,
@@ -172,7 +170,7 @@ export function ConnectedSelect({
     ...rulesWithDefaults,
     validate: {
       // Built-in required validation
-      notEmpty: builtInValidation,
+      atLeastOne: builtInValidation,
       // User-provided validation (if any)
       ...(typeof rules?.validate === 'function'
         ? { custom: rules.validate }
@@ -188,37 +186,47 @@ export function ConnectedSelect({
       rules={combinedRules}
       render={({ field, fieldState }) => {
         const hasError = !!fieldState.error;
+        const selectedValues = field.value || [];
+
+        const handleChange = (
+          optionValue: string | number,
+          checked: boolean
+        ) => {
+          let newValues: (string | number)[];
+          if (checked) {
+            newValues = [...selectedValues, optionValue];
+          } else {
+            newValues = selectedValues.filter(
+              (val: string | number) => val !== optionValue
+            );
+          }
+          field.onChange(newValues);
+        };
 
         return (
-          <FormControl error={hasError} fullWidth>
+          <FormControl error={hasError} component="fieldset">
             {!hideLabel && (
-              <InputLabel htmlFor={name} required={required}>
+              <FormLabel component="legend" required={required}>
                 {label}
-              </InputLabel>
+              </FormLabel>
             )}
-            <Select
-              {...field}
-              {...props}
-              id={name}
-              displayEmpty={!!placeholder}
-              aria-label={hideLabel ? label : undefined}
-            >
-              {placeholder && (
-                <MenuItem value="" disabled>
-                  {placeholder}
-                </MenuItem>
-              )}
+            <FormGroup row={row}>
               {options.map((option) => (
-                <MenuItem
+                <FormControlLabel
                   key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </MenuItem>
+                  control={
+                    <Checkbox
+                      checked={selectedValues.includes(option.value)}
+                      onChange={(_, checked) =>
+                        handleChange(option.value, checked)
+                      }
+                      disabled={option.disabled}
+                    />
+                  }
+                  label={option.label}
+                />
               ))}
-            </Select>
-
+            </FormGroup>
             {(hasError || helperText) && (
               <FormHelperText>
                 {fieldState.error?.message || helperText}

@@ -1,32 +1,34 @@
 import { Controller, ControllerProps } from 'react-hook-form';
 import {
+  Autocomplete,
+  AutocompleteProps,
   FormControl,
-  FormHelperText,
-  InputLabel,
-  Select,
-  SelectProps,
-  MenuItem,
+  TextField,
 } from '@mui/material';
 
-export interface SelectOption {
-  value: string | number;
+export interface AutocompleteOption {
   label: string;
+  value: string | number;
   disabled?: boolean;
 }
 
-export interface ConnectedSelectProps
-  extends Omit<SelectProps, 'name' | 'defaultValue'> {
+export interface ConnectedAutocompleteProps
+  extends Omit<
+    AutocompleteProps<AutocompleteOption, boolean, boolean, boolean>,
+    'name' | 'defaultValue' | 'options' | 'renderInput'
+  > {
   name: string;
   label: string;
   hideLabel?: boolean;
   helperText?: string;
   required?: boolean;
   rules?: ControllerProps['rules'];
-  options: SelectOption[];
+  options: AutocompleteOption[];
   placeholder?: string;
+  multiple?: boolean;
 }
 
-export function ConnectedSelect({
+export function ConnectedAutocomplete({
   name,
   label,
   hideLabel = false,
@@ -35,12 +37,23 @@ export function ConnectedSelect({
   rules,
   options,
   placeholder,
+  multiple = false,
   ...props
-}: ConnectedSelectProps) {
+}: ConnectedAutocompleteProps) {
   // Built-in validation to prevent empty selection when required
-  const builtInValidation = (value: string | number) => {
-    if (required && (value === '' || value === null || value === undefined)) {
-      return `${label} is required`;
+  const builtInValidation = (
+    value: AutocompleteOption | AutocompleteOption[] | null
+  ) => {
+    if (required) {
+      if (multiple) {
+        if (!value || (Array.isArray(value) && value.length === 0)) {
+          return `${label} is required`;
+        }
+      } else {
+        if (!value) {
+          return `${label} is required`;
+        }
+      }
     }
     return true;
   };
@@ -191,39 +204,37 @@ export function ConnectedSelect({
 
         return (
           <FormControl error={hasError} fullWidth>
-            {!hideLabel && (
-              <InputLabel htmlFor={name} required={required}>
-                {label}
-              </InputLabel>
-            )}
-            <Select
+            <Autocomplete
               {...field}
               {...props}
-              id={name}
-              displayEmpty={!!placeholder}
-              aria-label={hideLabel ? label : undefined}
-            >
-              {placeholder && (
-                <MenuItem value="" disabled>
-                  {placeholder}
-                </MenuItem>
+              multiple={multiple}
+              options={options}
+              getOptionLabel={(option) =>
+                typeof option === 'string' ? option : option.label
+              }
+              getOptionDisabled={(option) =>
+                typeof option === 'string' ? false : option.disabled || false
+              }
+              isOptionEqualToValue={(option, value) =>
+                typeof option === 'string' && typeof value === 'string'
+                  ? option === value
+                  : typeof option !== 'string' && typeof value !== 'string'
+                  ? option.value === value.value
+                  : false
+              }
+              onChange={(_, value) => field.onChange(value)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label={hideLabel ? undefined : label}
+                  placeholder={placeholder}
+                  required={required}
+                  error={hasError}
+                  helperText={fieldState.error?.message || helperText}
+                  aria-label={hideLabel ? label : undefined}
+                />
               )}
-              {options.map((option) => (
-                <MenuItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-
-            {(hasError || helperText) && (
-              <FormHelperText>
-                {fieldState.error?.message || helperText}
-              </FormHelperText>
-            )}
+            />
           </FormControl>
         );
       }}

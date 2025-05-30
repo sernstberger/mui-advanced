@@ -2,44 +2,33 @@ import { Controller, ControllerProps } from 'react-hook-form';
 import {
   FormControl,
   FormHelperText,
-  InputLabel,
-  Select,
-  SelectProps,
-  MenuItem,
+  FormLabel,
+  Slider,
+  SliderProps,
 } from '@mui/material';
 
-export interface SelectOption {
-  value: string | number;
-  label: string;
-  disabled?: boolean;
-}
-
-export interface ConnectedSelectProps
-  extends Omit<SelectProps, 'name' | 'defaultValue'> {
+export interface ConnectedSliderProps
+  extends Omit<SliderProps, 'name' | 'defaultValue'> {
   name: string;
   label: string;
   hideLabel?: boolean;
   helperText?: string;
   required?: boolean;
   rules?: ControllerProps['rules'];
-  options: SelectOption[];
-  placeholder?: string;
 }
 
-export function ConnectedSelect({
+export function ConnectedSlider({
   name,
   label,
   hideLabel = false,
   helperText,
   required = false,
   rules,
-  options,
-  placeholder,
   ...props
-}: ConnectedSelectProps) {
-  // Built-in validation to prevent empty selection when required
-  const builtInValidation = (value: string | number) => {
-    if (required && (value === '' || value === null || value === undefined)) {
+}: ConnectedSliderProps) {
+  // Built-in validation for slider value when required
+  const builtInValidation = (value: number | number[]) => {
+    if (required && (value === null || value === undefined)) {
       return `${label} is required`;
     }
     return true;
@@ -172,7 +161,7 @@ export function ConnectedSelect({
     ...rulesWithDefaults,
     validate: {
       // Built-in required validation
-      notEmpty: builtInValidation,
+      hasValue: builtInValidation,
       // User-provided validation (if any)
       ...(typeof rules?.validate === 'function'
         ? { custom: rules.validate }
@@ -192,33 +181,18 @@ export function ConnectedSelect({
         return (
           <FormControl error={hasError} fullWidth>
             {!hideLabel && (
-              <InputLabel htmlFor={name} required={required}>
+              <FormLabel required={required} id={`${name}-label`}>
                 {label}
-              </InputLabel>
+              </FormLabel>
             )}
-            <Select
+            <Slider
               {...field}
               {...props}
-              id={name}
-              displayEmpty={!!placeholder}
+              value={field.value ?? (props.min || 0)}
+              onChange={(_, value) => field.onChange(value)}
+              aria-labelledby={hideLabel ? undefined : `${name}-label`}
               aria-label={hideLabel ? label : undefined}
-            >
-              {placeholder && (
-                <MenuItem value="" disabled>
-                  {placeholder}
-                </MenuItem>
-              )}
-              {options.map((option) => (
-                <MenuItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-
+            />
             {(hasError || helperText) && (
               <FormHelperText>
                 {fieldState.error?.message || helperText}

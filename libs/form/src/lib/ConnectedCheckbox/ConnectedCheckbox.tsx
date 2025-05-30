@@ -1,46 +1,33 @@
 import { Controller, ControllerProps } from 'react-hook-form';
 import {
+  Checkbox,
+  CheckboxProps,
   FormControl,
+  FormControlLabel,
   FormHelperText,
-  InputLabel,
-  Select,
-  SelectProps,
-  MenuItem,
 } from '@mui/material';
 
-export interface SelectOption {
-  value: string | number;
-  label: string;
-  disabled?: boolean;
-}
-
-export interface ConnectedSelectProps
-  extends Omit<SelectProps, 'name' | 'defaultValue'> {
+export interface ConnectedCheckboxProps
+  extends Omit<CheckboxProps, 'name' | 'defaultValue'> {
   name: string;
   label: string;
-  hideLabel?: boolean;
   helperText?: string;
   required?: boolean;
   rules?: ControllerProps['rules'];
-  options: SelectOption[];
-  placeholder?: string;
 }
 
-export function ConnectedSelect({
+export function ConnectedCheckbox({
   name,
   label,
-  hideLabel = false,
   helperText,
   required = false,
   rules,
-  options,
-  placeholder,
   ...props
-}: ConnectedSelectProps) {
-  // Built-in validation to prevent empty selection when required
-  const builtInValidation = (value: string | number) => {
-    if (required && (value === '' || value === null || value === undefined)) {
-      return `${label} is required`;
+}: ConnectedCheckboxProps) {
+  // Built-in validation to require checkbox to be checked when required
+  const builtInValidation = (value: boolean) => {
+    if (required && !value) {
+      return `${label} must be checked`;
     }
     return true;
   };
@@ -48,7 +35,7 @@ export function ConnectedSelect({
   // Create default error messages using the field label
   const getDefaultErrorMessages = () => {
     return {
-      required: `${label} is required`,
+      required: `${label} must be checked`,
       minLength: `${label} must be at least {value} characters`,
       maxLength: `${label} must be no more than {value} characters`,
       min: `${label} must be at least {value}`,
@@ -172,7 +159,7 @@ export function ConnectedSelect({
     ...rulesWithDefaults,
     validate: {
       // Built-in required validation
-      notEmpty: builtInValidation,
+      mustBeChecked: builtInValidation,
       // User-provided validation (if any)
       ...(typeof rules?.validate === 'function'
         ? { custom: rules.validate }
@@ -190,35 +177,19 @@ export function ConnectedSelect({
         const hasError = !!fieldState.error;
 
         return (
-          <FormControl error={hasError} fullWidth>
-            {!hideLabel && (
-              <InputLabel htmlFor={name} required={required}>
-                {label}
-              </InputLabel>
-            )}
-            <Select
-              {...field}
-              {...props}
-              id={name}
-              displayEmpty={!!placeholder}
-              aria-label={hideLabel ? label : undefined}
-            >
-              {placeholder && (
-                <MenuItem value="" disabled>
-                  {placeholder}
-                </MenuItem>
-              )}
-              {options.map((option) => (
-                <MenuItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-
+          <FormControl error={hasError}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  {...field}
+                  {...props}
+                  checked={field.value || false}
+                  onChange={(event, checked) => field.onChange(checked)}
+                />
+              }
+              label={label}
+              required={required}
+            />
             {(hasError || helperText) && (
               <FormHelperText>
                 {fieldState.error?.message || helperText}

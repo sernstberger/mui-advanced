@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/form"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

@@ -2,44 +2,33 @@ import { Controller, ControllerProps } from 'react-hook-form';
 import {
   FormControl,
   FormHelperText,
-  InputLabel,
-  Select,
-  SelectProps,
-  MenuItem,
+  FormLabel,
+  Rating,
+  RatingProps,
 } from '@mui/material';
 
-export interface SelectOption {
-  value: string | number;
-  label: string;
-  disabled?: boolean;
-}
-
-export interface ConnectedSelectProps
-  extends Omit<SelectProps, 'name' | 'defaultValue'> {
+export interface ConnectedRatingProps
+  extends Omit<RatingProps, 'name' | 'defaultValue'> {
   name: string;
   label: string;
   hideLabel?: boolean;
   helperText?: string;
   required?: boolean;
   rules?: ControllerProps['rules'];
-  options: SelectOption[];
-  placeholder?: string;
 }
 
-export function ConnectedSelect({
+export function ConnectedRating({
   name,
   label,
   hideLabel = false,
   helperText,
   required = false,
   rules,
-  options,
-  placeholder,
   ...props
-}: ConnectedSelectProps) {
-  // Built-in validation to prevent empty selection when required
-  const builtInValidation = (value: string | number) => {
-    if (required && (value === '' || value === null || value === undefined)) {
+}: ConnectedRatingProps) {
+  // Built-in validation to require a rating when required
+  const builtInValidation = (value: number | null) => {
+    if (required && (value === null || value === 0)) {
       return `${label} is required`;
     }
     return true;
@@ -172,7 +161,7 @@ export function ConnectedSelect({
     ...rulesWithDefaults,
     validate: {
       // Built-in required validation
-      notEmpty: builtInValidation,
+      hasRating: builtInValidation,
       // User-provided validation (if any)
       ...(typeof rules?.validate === 'function'
         ? { custom: rules.validate }
@@ -190,35 +179,20 @@ export function ConnectedSelect({
         const hasError = !!fieldState.error;
 
         return (
-          <FormControl error={hasError} fullWidth>
+          <FormControl error={hasError}>
             {!hideLabel && (
-              <InputLabel htmlFor={name} required={required}>
+              <FormLabel required={required} id={`${name}-label`}>
                 {label}
-              </InputLabel>
+              </FormLabel>
             )}
-            <Select
+            <Rating
               {...field}
               {...props}
-              id={name}
-              displayEmpty={!!placeholder}
+              value={field.value || null}
+              onChange={(_, value) => field.onChange(value)}
+              aria-labelledby={hideLabel ? undefined : `${name}-label`}
               aria-label={hideLabel ? label : undefined}
-            >
-              {placeholder && (
-                <MenuItem value="" disabled>
-                  {placeholder}
-                </MenuItem>
-              )}
-              {options.map((option) => (
-                <MenuItem
-                  key={option.value}
-                  value={option.value}
-                  disabled={option.disabled}
-                >
-                  {option.label}
-                </MenuItem>
-              ))}
-            </Select>
-
+            />
             {(hasError || helperText) && (
               <FormHelperText>
                 {fieldState.error?.message || helperText}
