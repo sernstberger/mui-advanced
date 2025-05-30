@@ -1,4 +1,4 @@
-import { Controller, ControllerProps } from 'react-hook-form';
+import { Controller, ControllerProps, RegisterOptions } from 'react-hook-form';
 import {
   FormControl,
   FormHelperText,
@@ -12,27 +12,71 @@ import {
   commonValidations,
 } from '../utils/validation';
 
-export interface ConnectedTextInputProps
-  extends Omit<InputProps, 'name' | 'defaultValue'> {
-  name: string;
-  label: string;
-  hideLabel?: boolean;
-  helperText?: string;
-  required?: boolean;
-  rules?: ControllerProps['rules'];
-}
+export type ConnectedTextInputProps = Omit<
+  InputProps,
+  | 'name'
+  | 'defaultValue'
+  | 'required'
+  | 'min'
+  | 'max'
+  | 'pattern'
+  | 'validate'
+  | 'minLength'
+  | 'maxLength'
+> &
+  RegisterOptions & {
+    name: string;
+    label: string;
+    hideLabel?: boolean;
+    helperText?: string;
+  };
 
 export function ConnectedTextInput({
   name,
   label,
   hideLabel = false,
   helperText,
-  required = false,
-  rules,
-  ...props
+  // Extract react-hook-form rules from props
+  required,
+  min,
+  max,
+  minLength,
+  maxLength,
+  pattern,
+  validate,
+  valueAsNumber,
+  valueAsDate,
+  setValueAs,
+  shouldUnregister,
+  onChange,
+  onBlur,
+  disabled,
+  deps,
+  ...otherProps
 }: ConnectedTextInputProps) {
+  const rules = {
+    required,
+    min,
+    max,
+    minLength,
+    maxLength,
+    pattern,
+    validate,
+    valueAsNumber,
+    valueAsDate,
+    setValueAs,
+    shouldUnregister,
+    onChange,
+    onBlur,
+    disabled,
+    deps,
+  };
+
+  // Convert required to boolean for UI (it might be a validation rule object)
+  const isRequired = Boolean(required);
+
   // Apply default messages to user rules
-  const rulesWithDefaults = applyDefaultMessages(rules, label, required);
+  const rulesWithDefaults = applyDefaultMessages(rules, label, isRequired);
 
   // Combine built-in validation with user-provided validation
   const combinedRules = combineValidationRules(
@@ -51,13 +95,13 @@ export function ConnectedTextInput({
         return (
           <FormControl error={hasError}>
             {!hideLabel && (
-              <InputLabel htmlFor={name} required={required}>
+              <InputLabel htmlFor={name} required={isRequired}>
                 {label}
               </InputLabel>
             )}
             <Input
               {...field}
-              {...props}
+              {...otherProps}
               id={name}
               aria-label={hideLabel ? label : undefined}
             />

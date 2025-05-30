@@ -33,8 +33,8 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByLabelText('Test Label')).toBeDefined();
-      expect(screen.getByText('Test Label')).toBeDefined();
+      expect(screen.getByLabelText(/Test Label/)).toBeDefined();
+      expect(screen.getByText(/Test Label/)).toBeDefined();
     });
 
     it('should render without label when hideLabel is true', () => {
@@ -45,7 +45,7 @@ describe('ConnectedTextInput', () => {
       );
 
       // Label text should not be visible
-      expect(screen.queryByText('Test Label')).toBeNull();
+      expect(screen.queryByText(/Test Label/)).toBeNull();
       // Input should still be accessible (MUI handles this internally)
       expect(screen.getByRole('textbox')).toBeDefined();
     });
@@ -72,7 +72,7 @@ describe('ConnectedTextInput', () => {
       );
 
       // MUI shows required indicator - just verify the label is present
-      const labelElement = screen.getByText('Test Label');
+      const labelElement = screen.getByText(/Test Label/);
       expect(labelElement).toBeDefined();
       // Required functionality is tested through actual validation tests
     });
@@ -101,7 +101,7 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Test Label');
+      const input = screen.getByLabelText(/Test Label/);
       expect(input).toBeDefined();
     });
 
@@ -116,7 +116,7 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Test Label');
+      const input = screen.getByLabelText(/Test Label/);
       await user.type(input, 'test value');
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
@@ -141,7 +141,7 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Dynamic Field');
+      const input = screen.getByLabelText(/Dynamic Field/);
 
       await user.type(input, 'first');
       await user.clear(input);
@@ -169,7 +169,7 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="required"
             label="Required Field"
-            rules={{ required: 'This field is required' }}
+            required="This field is required"
           />
           <button type="submit">Submit</button>
         </TestWrapper>
@@ -191,16 +191,14 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="length"
             label="Length Field"
-            rules={{
-              minLength: { value: 3, message: 'Minimum 3 characters' },
-              maxLength: { value: 10, message: 'Maximum 10 characters' },
-            }}
+            minLength={{ value: 3, message: 'Minimum 3 characters' }}
+            maxLength={{ value: 10, message: 'Maximum 10 characters' }}
           />
           <button type="submit">Submit</button>
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Length Field');
+      const input = screen.getByLabelText(/Length Field/);
       const submitButton = screen.getByRole('button', { name: 'Submit' });
 
       // Test min length
@@ -229,20 +227,18 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="email"
             label="Email Field"
-            rules={{
-              validate: (value) => {
-                if (!value?.includes('@')) {
-                  return 'Must be a valid email';
-                }
-                return true;
-              },
+            validate={(value) => {
+              if (!value?.includes('@')) {
+                return 'Must be a valid email';
+              }
+              return true;
             }}
           />
           <button type="submit">Submit</button>
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Email Field');
+      const input = screen.getByLabelText(/Email Field/);
       await user.type(input, 'invalid-email');
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
@@ -263,7 +259,7 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('No Whitespace Field');
+      const input = screen.getByLabelText(/No Whitespace Field/);
       await user.type(input, '   '); // Only spaces
 
       const submitButton = screen.getByRole('button', { name: 'Submit' });
@@ -284,13 +280,13 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="clearErrors"
             label="Clear Errors Field"
-            rules={{ required: 'This field is required' }}
+            required="This field is required"
           />
           <button type="submit">Submit</button>
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Clear Errors Field');
+      const input = screen.getByLabelText(/Clear Errors Field/);
       const submitButton = screen.getByRole('button', { name: 'Submit' });
 
       // Trigger error
@@ -315,17 +311,15 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="username"
             label="Username"
-            rules={{
-              required: true,
-              minLength: 3,
-              maxLength: 10,
-            }}
+            required
+            minLength={3}
+            maxLength={10}
           />
           <button type="submit">Submit</button>
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Username');
+      const input = screen.getByLabelText(/Username/);
       const submitButton = screen.getByRole('button', { name: 'Submit' });
 
       // Test default required message
@@ -362,20 +356,18 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="email"
             label="Email Address"
-            rules={{
-              required: 'Please enter your email',
-              minLength: { value: 5, message: 'Email too short!' },
-              pattern: {
-                value: /\S+@\S+\.\S+/,
-                message: 'Invalid email format',
-              },
+            required="Please enter your email"
+            minLength={{ value: 5, message: 'Email too short!' }}
+            pattern={{
+              value: /\S+@\S+\.\S+/,
+              message: 'Invalid email format',
             }}
           />
           <button type="submit">Submit</button>
         </TestWrapper>
       );
 
-      const input = screen.getByLabelText('Email Address');
+      const input = screen.getByLabelText(/Email Address/);
       const submitButton = screen.getByRole('button', { name: 'Submit' });
 
       // Test custom required message
@@ -433,7 +425,7 @@ describe('ConnectedTextInput', () => {
           <ConnectedTextInput
             name="invalid"
             label="Invalid Field"
-            rules={{ required: 'Required' }}
+            required="Required"
           />
           <button type="submit">Submit</button>
         </TestWrapper>
@@ -460,8 +452,8 @@ describe('ConnectedTextInput', () => {
         </TestWrapper>
       );
 
-      const firstInput = screen.getByLabelText('First Field');
-      const secondInput = screen.getByLabelText('Second Field');
+      const firstInput = screen.getByLabelText(/First Field/);
+      const secondInput = screen.getByLabelText(/Second Field/);
 
       // Tab navigation - just verify inputs exist and can receive focus
       await user.click(firstInput);
