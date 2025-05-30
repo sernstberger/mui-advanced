@@ -155,21 +155,19 @@ export function ConnectedAutocomplete({
                   error={hasError}
                   helperText={fieldState.error?.message || helperText}
                   aria-label={hideLabel ? label : undefined}
-                  InputLabelProps={
-                    {
+                  slotProps={{
+                    inputLabel: {
                       ...params.InputLabelProps,
                       id: labelId,
                       'data-testid': labelTestId,
-                    } as any
-                  }
-                  FormHelperTextProps={
-                    {
+                    },
+                    formHelperText: {
                       id: hasError ? errorTextId : helperTextId,
                       'data-testid': hasError
                         ? errorTextTestId
                         : helperTextTestId,
-                    } as any
-                  }
+                    },
+                  }}
                 />
               )}
             />

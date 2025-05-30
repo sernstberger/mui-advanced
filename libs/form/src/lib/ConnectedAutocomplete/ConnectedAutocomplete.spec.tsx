@@ -25,7 +25,10 @@ function TestWrapper({
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={onSubmit ? methods.handleSubmit(onSubmit) : undefined}>
+      <form
+        onSubmit={onSubmit ? methods.handleSubmit(onSubmit) : undefined}
+        noValidate
+      >
         {children}
       </form>
     </FormProvider>
