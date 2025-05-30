@@ -99,21 +99,6 @@ export const HiddenLabel: Story = {
   },
 };
 
-export const WithDefaultValue: Story = {
-  args: {
-    name: 'defaultField',
-    label: 'Field with Default',
-    helperText: 'This field has a default value',
-  },
-  decorators: [
-    (Story) => (
-      <FormWrapper defaultValues={{ defaultField: 'Default Value' }}>
-        <Story />
-      </FormWrapper>
-    ),
-  ],
-};
-
 export const PlaygroundTest: Story = {
   args: {
     name: 'testField',
