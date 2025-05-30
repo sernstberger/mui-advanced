@@ -6,6 +6,11 @@ import {
   Rating,
   RatingProps,
 } from '@mui/material';
+import {
+  applyDefaultMessages,
+  combineValidationRules,
+  commonValidations,
+} from '../utils/validation';
 
 export interface ConnectedRatingProps
   extends Omit<RatingProps, 'name' | 'defaultValue'> {
@@ -26,150 +31,15 @@ export function ConnectedRating({
   rules,
   ...props
 }: ConnectedRatingProps) {
-  // Built-in validation to require a rating when required
-  const builtInValidation = (value: number | null) => {
-    if (required && (value === null || value === 0)) {
-      return `${label} is required`;
-    }
-    return true;
-  };
-
-  // Create default error messages using the field label
-  const getDefaultErrorMessages = () => {
-    return {
-      required: `${label} is required`,
-      minLength: `${label} must be at least {value} characters`,
-      maxLength: `${label} must be no more than {value} characters`,
-      min: `${label} must be at least {value}`,
-      max: `${label} must be no more than {value}`,
-      pattern: `${label} format is invalid`,
-    };
-  };
-
-  // Apply default error messages to rules if not already provided
-  const applyDefaultMessages = (userRules: ControllerProps['rules']) => {
-    const defaults = getDefaultErrorMessages();
-    const enhancedRules: ControllerProps['rules'] = {};
-
-    // Handle required rule
-    if (userRules?.required !== undefined) {
-      if (typeof userRules.required === 'boolean') {
-        enhancedRules.required = userRules.required ? defaults.required : false;
-      } else if (typeof userRules.required === 'string') {
-        enhancedRules.required = userRules.required; // Custom message provided
-      } else {
-        enhancedRules.required = userRules.required; // Object with value/message
-      }
-    } else if (required) {
-      // If required prop is true but no required rule, add default
-      enhancedRules.required = defaults.required;
-    }
-
-    // Only process other rules if userRules exists
-    if (userRules) {
-      // Handle minLength rule
-      if (userRules.minLength !== undefined) {
-        if (typeof userRules.minLength === 'number') {
-          enhancedRules.minLength = {
-            value: userRules.minLength,
-            message: defaults.minLength.replace(
-              '{value}',
-              userRules.minLength.toString()
-            ),
-          };
-        } else {
-          enhancedRules.minLength = userRules.minLength; // Custom message provided
-        }
-      }
-
-      // Handle maxLength rule
-      if (userRules.maxLength !== undefined) {
-        if (typeof userRules.maxLength === 'number') {
-          enhancedRules.maxLength = {
-            value: userRules.maxLength,
-            message: defaults.maxLength.replace(
-              '{value}',
-              userRules.maxLength.toString()
-            ),
-          };
-        } else {
-          enhancedRules.maxLength = userRules.maxLength; // Custom message provided
-        }
-      }
-
-      // Handle min rule
-      if (userRules.min !== undefined) {
-        if (typeof userRules.min === 'number') {
-          enhancedRules.min = {
-            value: userRules.min,
-            message: defaults.min.replace('{value}', userRules.min.toString()),
-          };
-        } else {
-          enhancedRules.min = userRules.min; // Custom message provided
-        }
-      }
-
-      // Handle max rule
-      if (userRules.max !== undefined) {
-        if (typeof userRules.max === 'number') {
-          enhancedRules.max = {
-            value: userRules.max,
-            message: defaults.max.replace('{value}', userRules.max.toString()),
-          };
-        } else {
-          enhancedRules.max = userRules.max; // Custom message provided
-        }
-      }
-
-      // Handle pattern rule
-      if (userRules.pattern !== undefined) {
-        if (userRules.pattern instanceof RegExp) {
-          enhancedRules.pattern = {
-            value: userRules.pattern,
-            message: defaults.pattern,
-          };
-        } else {
-          enhancedRules.pattern = userRules.pattern; // Custom message provided
-        }
-      }
-
-      // Copy other rules as-is
-      Object.keys(userRules).forEach((key) => {
-        if (
-          ![
-            'required',
-            'minLength',
-            'maxLength',
-            'min',
-            'max',
-            'pattern',
-          ].includes(key)
-        ) {
-          (enhancedRules as any)[key] = (userRules as any)[key];
-        }
-      });
-    }
-
-    return enhancedRules;
-  };
-
   // Apply default messages to user rules
-  const rulesWithDefaults = applyDefaultMessages(rules);
+  const rulesWithDefaults = applyDefaultMessages(rules, label, required);
 
   // Combine built-in validation with user-provided validation
-  const combinedRules = {
-    ...rulesWithDefaults,
-    validate: {
-      // Built-in required validation
-      hasRating: builtInValidation,
-      // User-provided validation (if any)
-      ...(typeof rules?.validate === 'function'
-        ? { custom: rules.validate }
-        : typeof rules?.validate === 'object'
-        ? rules.validate
-        : {}),
-    },
-  };
+  const combinedRules = combineValidationRules(
+    rulesWithDefaults,
+    required ? { hasRating: commonValidations.hasRating(label) } : {},
+    rules
+  );
 
   return (
     <Controller
@@ -181,16 +51,14 @@ export function ConnectedRating({
         return (
           <FormControl error={hasError}>
             {!hideLabel && (
-              <FormLabel required={required} id={`${name}-label`}>
+              <FormLabel component="legend" required={required}>
                 {label}
               </FormLabel>
             )}
             <Rating
               {...field}
               {...props}
-              value={field.value || null}
               onChange={(_, value) => field.onChange(value)}
-              aria-labelledby={hideLabel ? undefined : `${name}-label`}
               aria-label={hideLabel ? label : undefined}
             />
             {(hasError || helperText) && (

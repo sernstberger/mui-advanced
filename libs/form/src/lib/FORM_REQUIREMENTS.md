@@ -1,5 +1,12 @@
 # Form Requirements
 
+## Development
+
+### Running Tests
+```bash
+nx test form
+```
+
 ## Functional Requirements
 
 ### Core Functionality

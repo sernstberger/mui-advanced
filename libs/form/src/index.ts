@@ -7,3 +7,4 @@ export * from './lib/ConnectedCheckboxGroup/ConnectedCheckboxGroup';
 export * from './lib/ConnectedRating/ConnectedRating';
 export * from './lib/ConnectedSlider/ConnectedSlider';
 export * from './lib/ConnectedSwitch/ConnectedSwitch';
+export * from './lib/utils/validation';

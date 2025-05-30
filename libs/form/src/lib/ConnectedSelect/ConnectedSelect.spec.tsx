@@ -43,7 +43,7 @@ describe('ConnectedSelect', () => {
         </TestWrapper>
       );
 
-      expect(screen.getByText('Test Select')).toBeDefined();
+      expect(screen.getByLabelText('Test Select')).toBeDefined();
       expect(screen.getByRole('combobox')).toBeDefined();
     });
 
