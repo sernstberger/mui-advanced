@@ -16,9 +16,9 @@
 - [x] Required `label` prop for accessibility and display
 - [x] Support `hideLabel` prop to hide visual label while maintaining accessibility
 - [x] Automatically use `label` as `aria-label` when label is hidden
-- [ ] Support `placeholder` prop
-- [ ] Support `helperText` prop for additional guidance
-- [ ] Support `required` visual indicator
+- [x] Support `placeholder` prop
+- [x] Support `helperText` prop for additional guidance
+- [x] Support `required` visual indicator
 - [ ] Support input variants (standard, outlined, filled)
 
 ### Validation & Error Handling
@@ -93,42 +93,42 @@ interface ConnectedTextInputProps extends Omit<InputProps, 'name' | 'defaultValu
 ### Unit Tests
 
 #### Rendering Tests
-- [ ] **should render with label**: Verify input renders with visible label
-- [ ] **should render without label when hideLabel is true**: Verify label is visually hidden but accessible
+- [x] **should render with label**: Verify input renders with visible label
+- [x] **should render without label when hideLabel is true**: Verify label is visually hidden but accessible
 - [ ] **should render with aria-label when label is hidden**: Verify aria-label is applied correctly
-- [ ] **should render with helper text**: Verify helper text appears and is associated with input
-- [ ] **should render with placeholder**: Verify placeholder text appears
-- [ ] **should render required indicator**: Verify required field indication
+- [x] **should render with helper text**: Verify helper text appears and is associated with input
+- [x] **should render with placeholder**: Verify placeholder text appears
+- [x] **should render required indicator**: Verify required field indication
 - [ ] **should render with different variants**: Test standard, outlined, filled variants
 
 #### Form Integration Tests
-- [ ] **should work inside FormProvider**: Verify component works with react-hook-form context
-- [ ] **should register with form control**: Verify field registers with form state
-- [ ] **should update form value on change**: Verify value changes update form state
+- [x] **should work inside FormProvider**: Verify component works with react-hook-form context
+- [x] **should register with form control**: Verify field registers with form state
+- [x] **should update form value on change**: Verify value changes update form state
 - [ ] **should reset with form reset**: Verify field resets when form resets
 
 #### Validation Tests
-- [ ] **should show required field error**: Test required validation
-- [ ] **should show min/max length errors**: Test length validation
-- [ ] **should show custom validation errors**: Test custom rules
+- [x] **should show required field error**: Test required validation
+- [x] **should show min/max length errors**: Test length validation
+- [x] **should show custom validation errors**: Test custom rules
 - [ ] **should show zod validation errors**: Test zod schema validation
 - [x] **should prevent whitespace-only input**: Test built-in trim validation (no explicit rules needed)
-- [ ] **should clear errors on valid input**: Test error clearing
+- [x] **should clear errors on valid input**: Test error clearing
 - [ ] **should not submit form with validation errors**: Test form submission prevention
 
 #### Accessibility Tests
 - [ ] **should have accessible name**: Test aria-label or aria-labelledby
 - [ ] **should have accessible description**: Test aria-describedby for helper text
-- [ ] **should indicate validation state**: Test aria-invalid attribute
+- [x] **should indicate validation state**: Test aria-invalid attribute
 - [ ] **should indicate required state**: Test aria-required attribute
-- [ ] **should be keyboard navigable**: Test tab navigation
+- [x] **should be keyboard navigable**: Test tab navigation
 - [ ] **should have visible focus indicator**: Test focus styles
 - [ ] **should work with screen readers**: Test with testing-library screen reader assertions
 
 #### Error Handling Tests
 - [ ] **should handle network validation errors**: Test async validation failures
 - [ ] **should handle malformed validation rules**: Test invalid rule handling
-- [ ] **should handle missing FormProvider**: Test error boundaries
+- [x] **should handle missing FormProvider**: Test error boundaries
 - [ ] **should handle missing name prop**: Test required prop validation
 
 ### Integration Tests
