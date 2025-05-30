@@ -70,9 +70,10 @@ export function ConnectedTextInput({
               aria-label={hideLabel ? label : undefined}
             />
 
-            {helperText && <FormHelperText>{helperText}</FormHelperText>}
-            {hasError && (
-              <FormHelperText>{fieldState.error?.message}</FormHelperText>
+            {(hasError || helperText) && (
+              <FormHelperText>
+                {fieldState.error?.message || helperText}
+              </FormHelperText>
             )}
           </FormControl>
         );
