@@ -90,6 +90,151 @@ describe('ConnectedTextInput', () => {
 
       expect(screen.getByPlaceholderText('Enter text here')).toBeDefined();
     });
+
+    // ID and data-testid tests
+    it('should have auto-generated data test IDs', () => {
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            helperText="Helper text"
+          />
+        </TestWrapper>
+      );
+
+      // Check that elements have data-testid based on name
+      expect(screen.getByTestId('testField-input')).toBeDefined();
+      expect(screen.getByTestId('testField-label')).toBeDefined();
+      expect(screen.getByTestId('testField-helper-text')).toBeDefined();
+    });
+
+    it('should use custom data-testid when provided', () => {
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            helperText="Helper text"
+            data-testid="custom"
+          />
+        </TestWrapper>
+      );
+
+      // Check that elements use custom data-testid as base
+      expect(screen.getByTestId('custom-input')).toBeDefined();
+      expect(screen.getByTestId('custom-label')).toBeDefined();
+      expect(screen.getByTestId('custom-helper-text')).toBeDefined();
+    });
+
+    it('should use name as default ID', () => {
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            helperText="Helper text"
+          />
+        </TestWrapper>
+      );
+
+      // The MUI Input component has a complex structure - find the actual input element
+      const actualInput = screen.getByRole('textbox');
+      const label = screen.getByTestId('testField-label');
+      const helperText = screen.getByTestId('testField-helper-text');
+
+      // Use the id property directly since getAttribute doesn't work with TypeScript
+      expect(actualInput.id).toBe('testField');
+      expect(label.id).toBe('testField-label');
+      expect(helperText.id).toBe('testField-helper-text');
+    });
+
+    it('should use custom ID when provided', () => {
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            helperText="Helper text"
+            id="customId"
+          />
+        </TestWrapper>
+      );
+
+      // Find the actual input element and other elements
+      const actualInput = screen.getByRole('textbox');
+      const label = screen.getByTestId('testField-label');
+      const helperText = screen.getByTestId('testField-helper-text');
+
+      expect(actualInput.id).toBe('customId');
+      expect(label.id).toBe('customId-label');
+      expect(helperText.id).toBe('customId-helper-text');
+    });
+
+    it('should maintain MUI accessibility relationships', () => {
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            helperText="Helper text"
+          />
+        </TestWrapper>
+      );
+
+      const actualInput = screen.getByRole('textbox');
+      const label = screen.getByTestId('testField-label');
+
+      // Check that label is properly associated with input via htmlFor
+      expect((label as HTMLLabelElement).htmlFor).toBe('testField');
+      expect(actualInput.id).toBe('testField');
+    });
+
+    it('should show error with correct data-testid', async () => {
+      const user = userEvent.setup();
+
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            required="This field is required"
+          />
+          <button type="submit">Submit</button>
+        </TestWrapper>
+      );
+
+      const submitButton = screen.getByRole('button', { name: 'Submit' });
+      await user.click(submitButton);
+
+      await waitFor(() => {
+        const errorText = screen.getByTestId('testField-error-text');
+        expect(errorText).toBeDefined();
+        expect((errorText as HTMLElement).textContent).toBe(
+          'This field is required'
+        );
+        expect(errorText.id).toBe('testField-error-text');
+      });
+    });
+
+    it('should support data attributes through InputProps', () => {
+      render(
+        <TestWrapper>
+          <ConnectedTextInput
+            name="testField"
+            label="Test Label"
+            data-custom="custom-value"
+            data-analytics="track-this"
+          />
+        </TestWrapper>
+      );
+
+      // Data attributes are applied to the MUI Input container, not the actual input element
+      const inputContainer = screen.getByTestId('testField-input');
+
+      expect((inputContainer as any).dataset.custom).toBe('custom-value');
+      expect((inputContainer as any).dataset.analytics).toBe('track-this');
+    });
   });
 
   // Form Integration Tests

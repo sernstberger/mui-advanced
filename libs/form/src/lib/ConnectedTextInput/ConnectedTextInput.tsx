@@ -29,6 +29,8 @@ export type ConnectedTextInputProps = Omit<
     label: string;
     hideLabel?: boolean;
     helperText?: string;
+    id?: string;
+    'data-testid'?: string;
   };
 
 export function ConnectedTextInput({
@@ -36,6 +38,8 @@ export function ConnectedTextInput({
   label,
   hideLabel = false,
   helperText,
+  id,
+  'data-testid': dataTestId,
   // Extract react-hook-form rules from props
   required,
   min,
@@ -85,6 +89,20 @@ export function ConnectedTextInput({
     rules
   );
 
+  // Generate IDs based on custom id or fallback to name
+  const baseId = id || name;
+  const inputId = baseId;
+  const labelId = `${baseId}-label`;
+  const helperTextId = `${baseId}-helper-text`;
+  const errorTextId = `${baseId}-error-text`;
+
+  // Generate data-testids based on custom data-testid or fallback to name
+  const baseTestId = dataTestId || name;
+  const inputTestId = `${baseTestId}-input`;
+  const labelTestId = `${baseTestId}-label`;
+  const helperTextTestId = `${baseTestId}-helper-text`;
+  const errorTextTestId = `${baseTestId}-error-text`;
+
   return (
     <Controller
       name={name}
@@ -95,19 +113,28 @@ export function ConnectedTextInput({
         return (
           <FormControl error={hasError}>
             {!hideLabel && (
-              <InputLabel htmlFor={name} required={isRequired}>
+              <InputLabel
+                htmlFor={inputId}
+                required={isRequired}
+                id={labelId}
+                data-testid={labelTestId}
+              >
                 {label}
               </InputLabel>
             )}
             <Input
               {...field}
               {...otherProps}
-              id={name}
+              id={inputId}
+              data-testid={inputTestId}
               aria-label={hideLabel ? label : undefined}
             />
 
             {(hasError || helperText) && (
-              <FormHelperText>
+              <FormHelperText
+                id={hasError ? errorTextId : helperTextId}
+                data-testid={hasError ? errorTextTestId : helperTextTestId}
+              >
                 {fieldState.error?.message || helperText}
               </FormHelperText>
             )}
