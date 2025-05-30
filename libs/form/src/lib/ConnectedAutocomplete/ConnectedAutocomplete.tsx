@@ -160,13 +160,13 @@ export function ConnectedAutocomplete({
                       ...params.InputLabelProps,
                       id: labelId,
                       'data-testid': labelTestId,
-                    },
+                    } as any,
                     formHelperText: {
                       id: hasError ? errorTextId : helperTextId,
                       'data-testid': hasError
                         ? errorTextTestId
                         : helperTextTestId,
-                    },
+                    } as any,
                   }}
                 />
               )}
