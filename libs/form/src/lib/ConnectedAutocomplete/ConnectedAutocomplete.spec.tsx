@@ -46,7 +46,9 @@ describe('ConnectedAutocomplete', () => {
       );
 
       expect(screen.getByLabelText('Test Label')).toBeDefined();
-      expect(screen.getByText('Test Label')).toBeDefined();
+      expect(
+        screen.getByRole('combobox', { name: 'Test Label' })
+      ).toBeDefined();
     });
 
     it('should render without label when hideLabel is true', () => {
@@ -99,9 +101,10 @@ describe('ConnectedAutocomplete', () => {
   describe('Validation', () => {
     it('should show required field error', async () => {
       const user = userEvent.setup();
+      const mockSubmit = vi.fn();
 
       render(
-        <TestWrapper>
+        <TestWrapper onSubmit={mockSubmit}>
           <ConnectedAutocomplete
             name="required"
             label="Required Field"
@@ -122,9 +125,10 @@ describe('ConnectedAutocomplete', () => {
 
     it('should show custom validation error', async () => {
       const user = userEvent.setup();
+      const mockSubmit = vi.fn();
 
       render(
-        <TestWrapper>
+        <TestWrapper onSubmit={mockSubmit}>
           <ConnectedAutocomplete
             name="custom"
             label="Custom Field"

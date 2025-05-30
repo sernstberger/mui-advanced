@@ -4,6 +4,7 @@ import {
   AutocompleteProps,
   FormControl,
   TextField,
+  FormHelperText,
 } from '@mui/material';
 
 export interface AutocompleteOption {
@@ -91,84 +92,9 @@ export function ConnectedAutocomplete({
 
     // Only process other rules if userRules exists
     if (userRules) {
-      // Handle minLength rule
-      if (userRules.minLength !== undefined) {
-        if (typeof userRules.minLength === 'number') {
-          enhancedRules.minLength = {
-            value: userRules.minLength,
-            message: defaults.minLength.replace(
-              '{value}',
-              userRules.minLength.toString()
-            ),
-          };
-        } else {
-          enhancedRules.minLength = userRules.minLength; // Custom message provided
-        }
-      }
-
-      // Handle maxLength rule
-      if (userRules.maxLength !== undefined) {
-        if (typeof userRules.maxLength === 'number') {
-          enhancedRules.maxLength = {
-            value: userRules.maxLength,
-            message: defaults.maxLength.replace(
-              '{value}',
-              userRules.maxLength.toString()
-            ),
-          };
-        } else {
-          enhancedRules.maxLength = userRules.maxLength; // Custom message provided
-        }
-      }
-
-      // Handle min rule
-      if (userRules.min !== undefined) {
-        if (typeof userRules.min === 'number') {
-          enhancedRules.min = {
-            value: userRules.min,
-            message: defaults.min.replace('{value}', userRules.min.toString()),
-          };
-        } else {
-          enhancedRules.min = userRules.min; // Custom message provided
-        }
-      }
-
-      // Handle max rule
-      if (userRules.max !== undefined) {
-        if (typeof userRules.max === 'number') {
-          enhancedRules.max = {
-            value: userRules.max,
-            message: defaults.max.replace('{value}', userRules.max.toString()),
-          };
-        } else {
-          enhancedRules.max = userRules.max; // Custom message provided
-        }
-      }
-
-      // Handle pattern rule
-      if (userRules.pattern !== undefined) {
-        if (userRules.pattern instanceof RegExp) {
-          enhancedRules.pattern = {
-            value: userRules.pattern,
-            message: defaults.pattern,
-          };
-        } else {
-          enhancedRules.pattern = userRules.pattern; // Custom message provided
-        }
-      }
-
-      // Copy other rules as-is
+      // Copy other rules as-is, including validate
       Object.keys(userRules).forEach((key) => {
-        if (
-          ![
-            'required',
-            'minLength',
-            'maxLength',
-            'min',
-            'max',
-            'pattern',
-          ].includes(key)
-        ) {
+        if (!['required'].includes(key)) {
           (enhancedRules as any)[key] = (userRules as any)[key];
         }
       });
