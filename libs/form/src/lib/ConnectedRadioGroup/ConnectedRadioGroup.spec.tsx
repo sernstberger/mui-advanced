@@ -187,8 +187,7 @@ describe('ConnectedRadioGroup', () => {
             name="required"
             label="Required Radio Group"
             options={testOptions}
-            required
-            rules={{ required: 'This field is required' }}
+            required="This field is required"
           />
           <button type="submit">Submit</button>
         </TestWrapper>

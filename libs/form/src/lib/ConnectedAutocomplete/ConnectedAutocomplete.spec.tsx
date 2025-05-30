@@ -36,7 +36,7 @@ describe('ConnectedAutocomplete', () => {
   describe('Rendering', () => {
     it('should render with label', () => {
       render(
-        <TestWrapper>
+        <TestWrapper defaultValues={{ test: null }}>
           <ConnectedAutocomplete
             name="test"
             label="Test Label"
@@ -53,7 +53,7 @@ describe('ConnectedAutocomplete', () => {
 
     it('should render without label when hideLabel is true', () => {
       render(
-        <TestWrapper>
+        <TestWrapper defaultValues={{ test: null }}>
           <ConnectedAutocomplete
             name="test"
             label="Test Label"
@@ -69,7 +69,7 @@ describe('ConnectedAutocomplete', () => {
 
     it('should render with helper text', () => {
       render(
-        <TestWrapper>
+        <TestWrapper defaultValues={{ test: null }}>
           <ConnectedAutocomplete
             name="test"
             label="Test Label"
@@ -84,7 +84,7 @@ describe('ConnectedAutocomplete', () => {
 
     it('should render with placeholder', () => {
       render(
-        <TestWrapper>
+        <TestWrapper defaultValues={{ test: null }}>
           <ConnectedAutocomplete
             name="test"
             label="Test Label"
@@ -104,12 +104,12 @@ describe('ConnectedAutocomplete', () => {
       const mockSubmit = vi.fn();
 
       render(
-        <TestWrapper onSubmit={mockSubmit}>
+        <TestWrapper defaultValues={{ required: null }} onSubmit={mockSubmit}>
           <ConnectedAutocomplete
             name="required"
             label="Required Field"
             options={mockOptions}
-            rules={{ required: 'This field is required' }}
+            required="This field is required"
           />
           <button type="submit">Submit</button>
         </TestWrapper>
@@ -128,18 +128,16 @@ describe('ConnectedAutocomplete', () => {
       const mockSubmit = vi.fn();
 
       render(
-        <TestWrapper onSubmit={mockSubmit}>
+        <TestWrapper defaultValues={{ custom: null }} onSubmit={mockSubmit}>
           <ConnectedAutocomplete
             name="custom"
             label="Custom Field"
             options={mockOptions}
-            rules={{
-              validate: (value) => {
-                if (value && value.value === '2') {
-                  return 'Option 2 is not allowed';
-                }
-                return true;
-              },
+            validate={(value: AutocompleteOption) => {
+              if (value && value.value === '2') {
+                return 'Option 2 is not allowed';
+              }
+              return true;
             }}
           />
           <button type="submit">Submit</button>
@@ -171,7 +169,7 @@ describe('ConnectedAutocomplete', () => {
       const mockSubmit = vi.fn();
 
       render(
-        <TestWrapper onSubmit={mockSubmit}>
+        <TestWrapper defaultValues={{ testField: null }} onSubmit={mockSubmit}>
           <ConnectedAutocomplete
             name="testField"
             label="Test Label"
